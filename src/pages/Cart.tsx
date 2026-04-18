@@ -64,8 +64,12 @@ export default function Cart() {
       }
 
       const now = new Date().toISOString();
-      if (promo.valid_from > now || promo.valid_until < now) {
-        toast.error('Promo code expired');
+      if (promo.valid_from > now) {
+        toast.error('Promo code not yet valid');
+        return;
+      }
+      if (promo.valid_until && promo.valid_until < now) {
+        toast.error('Promo code has expired');
         return;
       }
 
@@ -236,7 +240,17 @@ export default function Cart() {
       {/* Checkout Button */}
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50">
         <button 
-          onClick={() => navigate('/checkout', { state: { deliveryType, addressId: defaultAddress?.id, deliveryFee, discount, total, appliedPromo } })}
+          onClick={() => navigate('/checkout', { 
+            state: { 
+              deliveryType, 
+              addressId: defaultAddress?.id, 
+              defaultAddress,
+              deliveryFee, 
+              discount, 
+              total, 
+              appliedPromo 
+            } 
+          })}
           className="max-w-md mx-auto btn-primary w-full flex items-center justify-between"
         >
           <span>Proceed to Payment</span>

@@ -23,6 +23,13 @@ export default function OrderTracking() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // Helper function
+  const formatDeliveryAddress = (addr: any) => {
+    if (!addr) return 'Pickup at Restaurant';
+    if (typeof addr === 'string') return addr;
+    return [addr.street, addr.city, addr.state].filter(Boolean).join(', ');
+  };
+
   const { data: order, isLoading } = useQuery<Order>({
     queryKey: ['order', orderId],
     queryFn: async () => {
@@ -96,7 +103,9 @@ export default function OrderTracking() {
                </div>
                <div className="flex flex-col">
                   <span className="text-[10px] uppercase font-bold tracking-widest opacity-60">Delivery Address</span>
-                  <span className="text-sm font-bold line-clamp-1">{order.delivery_address || 'Pickup at Restaurant'}</span>
+                  <span className="text-sm font-bold line-clamp-1">
+                     {formatDeliveryAddress(order.delivery_address)}
+                  </span>
                </div>
             </div>
          </div>

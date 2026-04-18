@@ -12,6 +12,11 @@ import Home from './pages/Home';
 import Explore from './pages/Explore';
 import Orders from './pages/Orders';
 import ProfilePage from './pages/Profile';
+import PersonalInfo from './pages/Profile/PersonalInfo';
+import Addresses from './pages/Profile/Addresses';
+import MyReviews from './pages/Profile/Reviews';
+import Security from './pages/Profile/Security';
+import About from './pages/Profile/About';
 import FoodDetail from './pages/FoodDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -47,7 +52,17 @@ export default function App() {
   useEffect(() => {
     try {
       // Initial session check
-      supabase.auth.getSession().then(({ data: { session } }) => {
+      supabase.auth.getSession().then(({ data: { session }, error }) => {
+        if (error) {
+          // Handle common token errors by clearing local state
+          if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+            console.warn('Session expired or invalid, clearing local state...');
+            supabase.auth.signOut().then(() => setAuth(null, null));
+            return;
+          }
+          throw error;
+        }
+
         if (session) {
           fetchProfile(session.user.id, session.user);
         } else {
@@ -56,6 +71,11 @@ export default function App() {
       }).catch(err => {
         if (err.message.includes('Supabase configuration missing')) {
           setConfigError(err.message);
+        } else if (err.message.includes('Refresh Token Not Found')) {
+          setAuth(null, null);
+        } else {
+          console.error('Session check error:', err);
+          setAuth(null, null);
         }
       });
 
@@ -131,6 +151,11 @@ export default function App() {
             <Route path="/tracking/:orderId" element={<OrderTracking />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/personal-info" element={<PersonalInfo />} />
+            <Route path="/profile/addresses" element={<Addresses />} />
+            <Route path="/profile/reviews" element={<MyReviews />} />
+            <Route path="/profile/security" element={<Security />} />
+            <Route path="/profile/about" element={<About />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

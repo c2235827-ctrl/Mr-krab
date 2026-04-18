@@ -8,6 +8,7 @@ import { formatCurrency, cn } from '../lib/utils';
 import { useAuthStore } from '../store/useAuthStore';
 import { motion } from 'motion/react';
 import { useCartStore } from '../store/useCartStore';
+import { toast } from 'react-hot-toast';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -299,5 +300,3 @@ function DiscountCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
     </Link>
   );
 }
-
-import { toast } from 'react-hot-toast';

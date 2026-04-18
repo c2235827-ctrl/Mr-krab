@@ -1,26 +1,6 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
-let _supabase: SupabaseClient | null = null;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? 'https://yisnyqrztkwxqnvslmqr.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlpc255cXJ6dGt3eHFudnNsbXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0OTc2NjYsImV4cCI6MjA5MjA3MzY2Nn0.eboOYd1XrRgeut3O9aMCjbGXg19jrOQBM32nqyCyY_E';
 
-/**
- * Lazy-initialized Supabase client.
- * Using a Proxy allows us to keep the same 'supabase' export while deferring
- * initialization (and potential errors) until the first time it's actually used.
- */
-export const supabase = new Proxy({} as SupabaseClient, {
-  get(target, prop) {
-    if (!_supabase) {
-      const url = import.meta.env.VITE_SUPABASE_URL;
-      const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      if (!url || !key) {
-        throw new Error(
-          'Supabase configuration missing. Please provide VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY ' +
-          'in your environment variables to connect to your database.'
-        );
-      }
-      _supabase = createClient(url, key);
-    }
-    return (_supabase as any)[prop];
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseKey);

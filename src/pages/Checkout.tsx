@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { formatCurrency, generateOrderNumber } from '../lib/utils';
 import { toast } from 'react-hot-toast';
@@ -11,12 +12,20 @@ import { useState } from 'react';
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { deliveryType, addressId, deliveryFee, discount, total, appliedPromo } = location.state || {};
+  const { deliveryType, addressId, defaultAddress, deliveryFee, discount, total, appliedPromo } = location.state || {};
   
   const profile = useAuthStore((state) => state.profile);
   const user = useAuthStore((state) => state.user);
   const { items, clearCart, subtotal } = useCartStore();
   
+  const { data: walletBalance } = useQuery({
+    queryKey: ['wallet-balance'],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('get_my_wallet_balance');
+      return data ?? 0;
+    }
+  });
+
   const [paymentMethod, setPaymentMethod] = useState<'flutterwave' | 'cash' | 'wallet'>('flutterwave');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -42,18 +51,22 @@ export default function Checkout() {
 
   async function createOrder(paymentData?: any) {
     setIsProcessing(true);
-    const orderNumber = generateOrderNumber();
     
     try {
       // 1. Create Order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
-          order_number: orderNumber,
           user_id: user?.id,
           status: 'pending',
           delivery_type: deliveryType,
           address_id: addressId,
+          delivery_address: deliveryType === 'delivery' && defaultAddress ? {
+            street: defaultAddress.street,
+            city: defaultAddress.city,
+            state: defaultAddress.state,
+            landmark: defaultAddress.landmark,
+          } : null,
           subtotal,
           delivery_fee: deliveryFee,
           discount_amount: discount,
@@ -88,7 +101,7 @@ export default function Checkout() {
           user_id: user?.id,
           amount: total,
           method: paymentMethod,
-          status: paymentMethod === 'cash' ? 'pending' : 'completed',
+          status: paymentMethod === 'cash' ? 'pending' : 'success',
           flutterwave_tx_ref: paymentData?.tx_ref,
           flutterwave_tx_id: paymentData?.transaction_id?.toString(),
         });
@@ -128,7 +141,7 @@ export default function Checkout() {
     } else if (paymentMethod === 'cash') {
       createOrder();
     } else if (paymentMethod === 'wallet') {
-       if ((profile?.wallet_balance || 0) < total) {
+       if ((walletBalance ?? 0) < total) {
          toast.error('Insufficient wallet balance');
          return;
        }
@@ -155,7 +168,7 @@ export default function Checkout() {
            <div className="flex flex-col gap-3">
               {[
                 { id: 'flutterwave', label: 'Flutterwave (Card/USSD)', icon: CreditCard, color: 'text-accent bg-accent/10' },
-                { id: 'wallet', label: `Wallet Balance (${formatCurrency(profile?.wallet_balance || 0)})`, icon: Wallet, color: 'text-primary bg-primary/10' },
+                { id: 'wallet', label: `Wallet Balance (${formatCurrency(walletBalance ?? 0)})`, icon: Wallet, color: 'text-primary bg-primary/10' },
                 { id: 'cash', label: 'Cash on Delivery', icon: Banknote, color: 'text-muted bg-card' }
               ].map((m) => (
                 <button

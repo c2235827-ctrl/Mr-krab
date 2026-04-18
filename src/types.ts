@@ -3,11 +3,10 @@ export type Profile = {
   full_name: string | null;
   phone: string | null;
   avatar_url: string | null;
-  role: 'user' | 'admin' | 'rider';
+  role: 'customer' | 'admin' | 'kitchen_staff' | 'delivery_rider';
   is_active: boolean;
   biometric_enabled: boolean;
   marketing_alerts: boolean;
-  wallet_balance: number;
 };
 
 export type Address = {
@@ -106,7 +105,7 @@ export type Payment = {
   user_id: string;
   amount: number;
   method: 'flutterwave' | 'cash' | 'wallet';
-  status: 'pending' | 'completed' | 'failed';
+  status: 'pending' | 'success' | 'failed' | 'refunded';
   flutterwave_tx_ref: string | null;
   flutterwave_tx_id: string | null;
 };
@@ -125,7 +124,7 @@ export type Notification = {
   user_id: string;
   title: string;
   body: string;
-  type: 'order' | 'promo' | 'general';
+  type: 'order_update' | 'promo' | 'general';
   is_read: boolean;
   reference_id: string | null;
   created_at: string;
@@ -152,5 +151,6 @@ export type Review = {
   menu_item_id: string;
   rating: number;
   comment: string | null;
+  created_at: string;
   user?: Profile;
 };

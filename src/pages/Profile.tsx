@@ -1,5 +1,7 @@
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../lib/supabase';
 import { formatCurrency, cn } from '../lib/utils';
 import { 
   User, 
@@ -20,8 +22,32 @@ import { toast } from 'react-hot-toast';
 import { motion } from 'motion/react';
 
 export default function Profile() {
-  const { profile, signOut } = useAuthStore();
+  const { profile, user, setAuth, signOut } = useAuthStore();
   const navigate = useNavigate();
+
+  const { data: walletBalance } = useQuery({
+    queryKey: ['wallet-balance'],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('get_my_wallet_balance');
+      return data ?? 0;
+    }
+  });
+
+  const { data: orderCount } = useQuery({
+    queryKey: ['my-order-count'],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('get_my_order_count');
+      return data ?? 0;
+    }
+  });
+
+  const { data: reviewCount } = useQuery({
+    queryKey: ['my-review-count'],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('get_my_review_count');
+      return data ?? 0;
+    }
+  });
 
   const handleLogout = async () => {
     await signOut();
@@ -29,11 +55,28 @@ export default function Profile() {
     navigate('/auth');
   };
 
+  const toggleBiometric = async () => {
+    if (!profile?.id) return;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ biometric_enabled: !profile?.biometric_enabled })
+        .eq('id', profile.id)
+        .select()
+        .single();
+      if (error) throw error;
+      setAuth(user, data); // update state
+      toast.success(`Biometric login ${data.biometric_enabled ? 'enabled' : 'disabled'}`);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   const sections = [
     {
       title: 'Finance',
       items: [
-        { icon: Wallet, label: 'Wallet Balance', value: formatCurrency(profile?.wallet_balance || 0), path: '#', color: 'text-accent bg-accent/10' },
+        { icon: Wallet, label: 'Wallet Balance', value: formatCurrency(walletBalance ?? 0), path: '#', color: 'text-accent bg-accent/10' },
         { icon: History, label: 'Transaction History', path: '#', color: 'text-primary bg-primary/10' },
         { icon: PlusCircle, label: 'Add Funds', path: '#', color: 'text-green-600 bg-green-50' },
       ]
@@ -41,23 +84,23 @@ export default function Profile() {
     {
       title: 'Account Settings',
       items: [
-        { icon: UserCircle, label: 'Personal Information', path: '#' },
-        { icon: MapPin, label: 'My Addresses', path: '#' },
-        { icon: Star, label: 'My Reviews', path: '#' },
+        { icon: UserCircle, label: 'Personal Information', path: '/profile/personal-info' },
+        { icon: MapPin, label: 'My Addresses', path: '/profile/addresses' },
+        { icon: Star, label: 'My Reviews', path: '/profile/reviews' },
       ]
     },
     {
       title: 'Preferences',
       items: [
-        { icon: Bell, label: 'Notifications', path: '#' },
+        { icon: Bell, label: 'Notifications', path: '/notifications' },
         { icon: Smartphone, label: 'Biometric Login', path: '#', toggle: true, checked: profile?.biometric_enabled },
-        { icon: Shield, label: 'Privacy & Security', path: '#' },
+        { icon: Shield, label: 'Privacy & Security', path: '/profile/security' },
       ]
     },
     {
       title: 'Support',
       items: [
-        { icon: Info, label: 'About Mr. Krab', path: '#' },
+        { icon: Info, label: 'About Mr. Krab', path: '/profile/about' },
       ]
     }
   ];
@@ -85,11 +128,11 @@ export default function Profile() {
         <div className="flex gap-4">
            <div className="bg-white px-6 py-3 rounded-2xl shadow-sm text-center">
               <span className="block text-[10px] text-muted font-black uppercase tracking-widest">Orders</span>
-              <span className="font-serif font-black text-lg">12</span>
+              <span className="font-serif font-black text-lg">{orderCount ?? 0}</span>
            </div>
            <div className="bg-white px-6 py-3 rounded-2xl shadow-sm text-center">
               <span className="block text-[10px] text-muted font-black uppercase tracking-widest">Reviews</span>
-              <span className="font-serif font-black text-lg">5</span>
+              <span className="font-serif font-black text-lg">{reviewCount ?? 0}</span>
            </div>
         </div>
       </div>
@@ -103,6 +146,15 @@ export default function Profile() {
               {section.items.map((item, idx) => (
                 <button
                   key={item.label}
+                  onClick={() => {
+                    if (item.toggle) {
+                      toggleBiometric();
+                      return;
+                    }
+                    if (item.path !== '#') {
+                      navigate(item.path);
+                    }
+                  }}
                   className={cn(
                     "w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0",
                   )}
