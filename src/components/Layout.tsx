@@ -1,0 +1,87 @@
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Home, Search, ClipboardList, User, ShoppingCart } from 'lucide-react';
+import { cn } from '../lib/utils';
+import { useCartStore } from '../store/useCartStore';
+import { motion, AnimatePresence } from 'motion/react';
+
+const navItems = [
+  { icon: Home, label: 'Home', path: '/home' },
+  { icon: Search, label: 'Explore', path: '/explore' },
+  { icon: ClipboardList, label: 'Orders', path: '/orders' },
+  { icon: User, label: 'Profile', path: '/profile' },
+];
+
+export default function Layout() {
+  const location = useLocation();
+  const totalItems = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  
+  // Hide bottom nav on specific screens if needed (e.g. food detail)
+  const isDetailScreen = location.pathname.startsWith('/item/');
+  const isCartScreen = location.pathname === '/cart' || location.pathname === '/checkout';
+
+  return (
+    <div className="min-h-screen bg-bg pb-24">
+      {/* Main Content */}
+      <main className="max-w-md mx-auto min-h-screen relative bg-bg shadow-sm">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      {/* Floating Cart Button (only if not on cart/checkout and has items) */}
+      {!isCartScreen && !isDetailScreen && totalItems > 0 && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="fixed bottom-24 right-4 z-40"
+        >
+          <NavLink
+            to="/cart"
+            className="flex items-center gap-2 bg-accent text-white px-4 py-3 rounded-full shadow-xl"
+          >
+            <ShoppingCart size={20} />
+            <span className="font-bold">{totalItems}</span>
+          </NavLink>
+        </motion.div>
+      )}
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-100 px-6 py-3 z-50">
+        <div className="max-w-md mx-auto flex justify-between items-center">
+          {navItems.map(({ icon: Icon, label, path }) => {
+            const isActive = location.pathname === path;
+            return (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) => 
+                  cn(
+                    "flex flex-col items-center gap-1 transition-colors relative",
+                    isActive ? "text-primary" : "text-muted"
+                  )
+                }
+              >
+                <Icon size={24} className={cn("transition-transform", isActive && "scale-110")} />
+                <span className="text-[10px] font-medium uppercase tracking-widest">{label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute -bottom-1 w-1 h-1 bg-accent rounded-full"
+                  />
+                )}
+              </NavLink>
+            );
+          })}
+        </div>
+      </nav>
+    </div>
+  );
+}
