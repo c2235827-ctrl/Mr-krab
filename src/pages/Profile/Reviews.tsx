@@ -53,7 +53,7 @@ export default function MyReviews() {
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl overflow-hidden bg-card">
-                    <img src={review.menu_item.image_url} alt={review.menu_item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <img src={review.menu_item.image_url || undefined} alt={review.menu_item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </div>
                   <div>
                     <h4 className="font-serif font-black text-sm">{review.menu_item.name}</h4>

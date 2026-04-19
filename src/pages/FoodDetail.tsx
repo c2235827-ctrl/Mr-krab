@@ -116,7 +116,7 @@ export default function FoodDetail() {
       {/* Hero Image */}
       <div className="relative w-full aspect-[4/5] max-h-[500px] overflow-hidden">
         <img 
-          src={item.image_url} 
+          src={item.image_url || undefined} 
           alt={item.name} 
           className="w-full h-full object-cover" 
           referrerPolicy="no-referrer"

@@ -205,7 +205,7 @@ function FeaturedCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
     <div className="relative min-w-[280px] bg-white rounded-[40px] p-6 shadow-sm flex flex-col justify-between overflow-hidden snap-center">
       <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full overflow-hidden border-4 border-bg shadow-xl bg-card">
         <img 
-          src={item.image_url} 
+          src={item.image_url || undefined} 
           alt={item.name} 
           className="w-full h-full object-cover" 
           referrerPolicy="no-referrer"
@@ -246,7 +246,7 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
       <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
         <div className="aspect-square rounded-[24px] overflow-hidden bg-card relative">
           <img 
-            src={item.image_url} 
+            src={item.image_url || undefined} 
             alt={item.name} 
             className="w-full h-full object-cover transition-transform group-hover:scale-110" 
             referrerPolicy="no-referrer"
@@ -278,7 +278,7 @@ function DiscountCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
     <Link to={`/item/${item.slug}`} className="flex items-center gap-4 bg-white p-4 rounded-[24px] shadow-sm relative overflow-hidden group">
       <div className="w-20 h-20 rounded-2xl overflow-hidden bg-card shrink-0">
         <img 
-          src={item.image_url} 
+          src={item.image_url || undefined} 
           alt={item.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
           referrerPolicy="no-referrer"

@@ -141,7 +141,7 @@ export default function Cart() {
             >
               <div className="w-20 h-20 rounded-2xl overflow-hidden bg-card shrink-0">
                 <img 
-                  src={item.menuItem.image_url} 
+                  src={item.menuItem.image_url || undefined} 
                   alt={item.menuItem.name} 
                   className="w-full h-full object-cover" 
                   referrerPolicy="no-referrer"

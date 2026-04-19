@@ -142,7 +142,7 @@ function ExploreCard({ item, onAdd }: { item: MenuItem, onAdd: () => void; key?:
       <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
         <div className="aspect-[4/5] rounded-[24px] overflow-hidden bg-card relative">
           <img 
-            src={item.image_url} 
+            src={item.image_url || undefined} 
             alt={item.name} 
             className="w-full h-full object-cover transition-transform group-hover:scale-110" 
             referrerPolicy="no-referrer"
