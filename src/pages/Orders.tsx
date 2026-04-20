@@ -40,7 +40,7 @@ export default function Orders() {
     }
   };
 
-  if (isLoading) return <div className="p-10 text-center">Loading your seafood history...</div>;
+  if (isLoading) return <div className="p-10 text-center">Loading your order history...</div>;
 
   return (
     <div className="p-6 flex flex-col gap-6">
@@ -57,7 +57,7 @@ export default function Orders() {
             <ClipboardList size={48} className="text-muted" />
           </div>
           <h3 className="text-xl font-bold mb-2">No orders yet</h3>
-          <p className="text-muted mb-8">Ready to catch your first seafood?</p>
+          <p className="text-muted mb-8">Ready to place your first order?</p>
           <button onClick={() => navigate('/home')} className="btn-primary px-10">Start Ordering</button>
         </div>
       ) : (

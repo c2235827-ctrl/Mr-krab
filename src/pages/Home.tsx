@@ -104,7 +104,7 @@ export default function Home() {
           <Search size={18} className="text-muted" />
         </div>
         <div className="w-full bg-card py-4 pl-12 pr-4 rounded-2xl text-muted font-medium cursor-pointer">
-          Find your favorite seafood...
+          Find your favorite dishes...
         </div>
       </div>
 

@@ -10,10 +10,10 @@ import { ArrowLeft, Clock, MapPin, Package, CheckCircle2, Truck, Flag, Loader2 }
 const steps: { status: OrderStatus; label: string; icon: any; description: string }[] = [
   { status: 'pending', label: 'Order Placed', icon: ClipboardList, description: 'We have received your order' },
   { status: 'confirmed', label: 'Confirmed', icon: CheckCircle2, description: 'Chef is reviewing your order' },
-  { status: 'preparing', label: 'Preparing', icon: Utensils, description: 'Your seafood is being cooked' },
+  { status: 'preparing', label: 'Preparing', icon: Utensils, description: 'Your food is being cooked' },
   { status: 'ready', label: 'Ready', icon: Package, description: 'Order is ready for pickup/delivery' },
   { status: 'out_for_delivery', label: 'On its way', icon: Truck, description: 'Rider is bringing your order' },
-  { status: 'delivered', label: 'Delivered', icon: Flag, description: 'Enjoy your fresh catch! 🦀' },
+  { status: 'delivered', label: 'Delivered', icon: Flag, description: 'Enjoy your meal! 🦀' },
 ];
 
 import { Utensils, ClipboardList } from 'lucide-react';

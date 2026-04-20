@@ -53,7 +53,7 @@ export default function Explore() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={18} />
           <input
             type="text"
-            placeholder="Search fresh catches..."
+            placeholder="Search your favorites..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-gray-100 py-4 pl-12 pr-12 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all font-medium"
@@ -127,7 +127,7 @@ export default function Explore() {
         {!isLoading && items?.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
              <div className="text-6xl mb-4 opacity-20">🦀</div>
-             <h3 className="text-lg font-bold">No seafood found</h3>
+             <h3 className="text-lg font-bold">No results found</h3>
              <p className="text-sm text-muted">Try searching for something else or browse all.</p>
           </div>
         )}

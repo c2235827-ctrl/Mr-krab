@@ -15,7 +15,7 @@ export default defineConfig(({mode}) => {
         manifest: {
           name: 'Mr. Krab',
           short_name: 'MrKrab',
-          description: 'Fresh Catches. Delivered Fast.',
+          description: 'Real Food. Authentic Flavours.',
           theme_color: '#111111',
           background_color: '#FAFAFA',
           display: 'standalone',

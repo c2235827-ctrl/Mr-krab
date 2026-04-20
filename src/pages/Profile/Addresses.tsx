@@ -109,7 +109,7 @@ export default function Addresses() {
             <MapPin size={48} className="text-muted" />
           </div>
           <h3 className="text-xl font-bold mb-2">No addresses yet</h3>
-          <p className="text-muted mb-8">Add your delivery location to get your catches faster! 🦀</p>
+          <p className="text-muted mb-8">Add your delivery location to get your food faster! 🦀</p>
           <button 
             onClick={() => setIsAddingAddress(true)}
             className="btn-primary w-full max-w-[200px]"

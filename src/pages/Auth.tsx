@@ -4,9 +4,11 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Lock, User, Phone, ArrowLeft, Loader2 } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function Auth() {
   const navigate = useNavigate();
+  const { setAuth } = useAuthStore();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -21,22 +23,26 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+
+        // Fetch profile and set auth state BEFORE navigating
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        setAuth(data.user, profile);
         toast.success('Welcome back! 🦀');
-        navigate('/home');
+        navigate('/home', { replace: true });
+
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: {
-              full_name: fullName,
-              phone: phone,
-            },
+            data: { full_name: fullName, phone },
           },
         });
         if (error) throw error;
@@ -68,7 +74,7 @@ export default function Auth() {
           {isLogin ? 'Welcome Back' : 'Join the Family'}
         </h1>
         <p className="text-muted text-lg">
-          {isLogin ? 'Fresh seafood is just a tap away.' : 'Start your seafood journey with Mr. Krab.'}
+          {isLogin ? 'Authentic flavour is just a tap away.' : 'Start your food journey with Mr. Krab.'}
         </p>
       </div>
 

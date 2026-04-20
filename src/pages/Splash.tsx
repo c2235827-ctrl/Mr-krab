@@ -18,8 +18,8 @@ export default function Splash() {
       {/* Background Graphic/Image */}
       <div className="absolute inset-0 z-0 opacity-50">
         <img 
-          src="https://images.unsplash.com/photo-1550461716-dbf266b2a8a7?w=1080" 
-          alt="Crab" 
+          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1080" 
+          alt="Diverse Food" 
           className="h-full w-full object-cover"
           referrerPolicy="no-referrer"
         />
@@ -34,7 +34,7 @@ export default function Splash() {
           className="text-center"
         >
           <div className="text-7xl mb-4">🦀</div>
-          <span className="text-accent text-sm font-bold tracking-[0.3em] uppercase mb-2 block">Premium Seafood</span>
+          <span className="text-accent text-sm font-bold tracking-[0.3em] uppercase mb-2 block">Authentic Flavours</span>
           <h1 className="text-white text-6xl md:text-7xl font-black italic leading-tight">
             Mr. Krab
           </h1>
@@ -48,7 +48,7 @@ export default function Splash() {
           transition={{ delay: 0.5, duration: 0.8 }}
         >
           <p className="text-gray-300 text-lg mb-10 leading-relaxed font-light">
-            Fresh Catches. <br />
+            Real Food. <br />
             <span className="font-bold text-white">Delivered Fast.</span>
           </p>
           

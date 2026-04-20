@@ -45,7 +45,7 @@ export default function Checkout() {
     },
     customizations: {
       title: 'Mr. Krab Restaurant',
-      description: 'Payment for fresh seafood order',
+      description: 'Payment for Mr. Krab order',
       logo: 'https://api.dicebear.com/7.x/initials/svg?seed=MK',
     },
   };

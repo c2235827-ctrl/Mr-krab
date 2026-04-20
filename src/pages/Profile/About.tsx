@@ -1,12 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Instagram, Twitter, Globe, Info, Heart } from 'lucide-react';
+import { ArrowLeft, Heart, Utensils, Clock, MapPin, Phone } from 'lucide-react';
 
 export default function About() {
   const navigate = useNavigate();
 
+  const menu_highlights = [
+    { emoji: '🍛', label: 'Jollof Rice' },
+    { emoji: '🍗', label: 'Grilled Chicken' },
+    { emoji: '🍕', label: 'Pizza' },
+    { emoji: '🌯', label: 'Shawarma' },
+    { emoji: '🍔', label: 'Burgers' },
+    { emoji: '🍝', label: 'Pasta' },
+    { emoji: '🥩', label: 'Peppered Meat' },
+    { emoji: '🥤', label: 'Cold Drinks' },
+  ];
+
   return (
-    <div className="min-h-screen bg-bg p-6 flex flex-col gap-10">
+    <div className="min-h-screen bg-bg p-6 flex flex-col gap-10 mb-20">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
@@ -15,48 +26,127 @@ export default function About() {
         <h1 className="text-2xl font-black italic">About Mr. Krab</h1>
       </div>
 
-      <div className="flex flex-col items-center gap-8 text-center mt-4">
-        <div className="w-40 h-40 bg-primary rounded-[56px] shadow-2xl flex items-center justify-center p-8 relative rotate-[-2deg]">
-           <img src="/logo.svg" alt="Mr. Krab Logo" className="w-full h-full object-contain invert" onError={(e) => (e.currentTarget.style.display = 'none')} />
-           <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-white font-serif font-black italic text-5xl">Mk</span>
-           </div>
+      {/* Hero */}
+      <div className="flex flex-col items-center gap-6 text-center mt-2">
+        <div className="w-36 h-36 bg-primary rounded-[48px] shadow-2xl flex items-center justify-center rotate-[-2deg]">
+          <span className="text-white font-serif font-black italic text-5xl">Mk</span>
         </div>
-        
-        <div className="flex flex-col gap-3 max-w-[280px]">
-           <h2 className="text-3xl font-serif font-black italic">Fresh From the Deep</h2>
-           <p className="text-muted text-sm leading-relaxed">
-             Mr. Krab was founded with one goal: to bring the ocean's freshest catches right to your doorstep. No shells, just pure taste. 🦀
-           </p>
+
+        <div className="flex flex-col gap-3 max-w-[300px]">
+          <h2 className="text-3xl font-serif font-black italic leading-tight">
+            Real Food. <br />Real Flavour.
+          </h2>
+          <p className="text-muted text-sm leading-relaxed">
+            At Mr. Krab, we're all about serving the food you love every day — 
+            from smoky jollof rice and crispy grilled chicken to loaded shawarmas, 
+            fresh pizzas, and everything in between. 🦀
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-8">
-        <div className="flex flex-col gap-4">
-           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted ml-2">Connect With Us</h3>
-           <div className="bg-white rounded-[32px] overflow-hidden shadow-sm p-2 flex justify-around">
-             {[
-               { icon: Instagram, label: 'Instagram', color: 'text-pink-500' },
-               { icon: Twitter, label: 'Twitter', color: 'text-sky-500' },
-               { icon: Globe, label: 'Website', color: 'text-accent' }
-             ].map((social) => (
-               <button key={social.label} className="flex flex-col items-center gap-2 p-4 rounded-3xl hover:bg-gray-50 transition-colors">
-                  <div className={`w-12 h-12 rounded-2xl bg-card flex items-center justify-center ${social.color}`}>
-                    <social.icon size={20} />
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest">{social.label}</span>
-               </button>
-             ))}
-           </div>
-        </div>
+      {/* Our Story */}
+      <div className="bg-white p-7 rounded-[40px] shadow-sm flex flex-col gap-4">
+        <h3 className="text-xl font-serif font-black italic">Our Story</h3>
+        <p className="text-muted text-sm leading-relaxed">
+          Mr. Krab started with a simple mission — make great food accessible to everyone. 
+          We cook the meals Nigerians grew up on, plus the international favourites that 
+          have become part of our everyday life.
+        </p>
+        <p className="text-muted text-sm leading-relaxed">
+          Every dish is prepared fresh, with quality ingredients and the kind of care 
+          that makes you feel at home with every bite. Whether you're ordering jollof 
+          for the family or grabbing a quick shawarma, we've got you covered.
+        </p>
+      </div>
 
-        <div className="bg-card p-6 rounded-[32px] text-center border-dashed border-2 border-muted/20">
-           <div className="flex items-center justify-center gap-2 mb-2">
-             <Heart size={14} className="text-red-500 fill-red-500" />
-             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Handcrafted for foodies</span>
-           </div>
-           <p className="text-[10px] font-black uppercase tracking-[0.1em] text-muted opacity-40">Version 1.0.0 (Build 2026.04.18)</p>
+      {/* What We Serve */}
+      <div className="flex flex-col gap-4">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted ml-2">
+          What We Serve
+        </h3>
+        <div className="grid grid-cols-4 gap-3">
+          {menu_highlights.map((item) => (
+            <div
+              key={item.label}
+              className="bg-white rounded-[24px] p-3 shadow-sm flex flex-col items-center gap-2 text-center"
+            >
+              <span className="text-3xl">{item.emoji}</span>
+              <span className="text-[9px] font-black uppercase tracking-wider text-muted leading-tight">
+                {item.label}
+              </span>
+            </div>
+          ))}
         </div>
+        <p className="text-center text-xs text-muted font-medium mt-1">
+          ...and much more on the menu 🔥
+        </p>
+      </div>
+
+      {/* Why Choose Us */}
+      <div className="flex flex-col gap-3">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted ml-2">
+          Why Mr. Krab
+        </h3>
+        <div className="bg-white rounded-[32px] overflow-hidden shadow-sm">
+          {[
+            { icon: Utensils, title: 'Freshly Cooked', desc: 'Every order is made fresh — no reheating, ever.' },
+            { icon: Clock, title: 'Fast Delivery', desc: 'Hot food at your door in 30–45 minutes.' },
+            { icon: MapPin, title: 'Order Anywhere', desc: 'Delivery, pickup, or dine in — your choice.' },
+          ].map((item, i) => (
+            <div
+              key={item.title}
+              className={`flex items-center gap-4 p-5 ${i < 2 ? 'border-b border-gray-50' : ''}`}
+            >
+              <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                <item.icon size={20} />
+              </div>
+              <div>
+                <p className="font-bold text-sm">{item.title}</p>
+                <p className="text-xs text-muted">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Contact */}
+      <div className="flex flex-col gap-3">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted ml-2">
+          Get In Touch
+        </h3>
+        <div className="bg-white p-5 rounded-[32px] shadow-sm flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Phone size={18} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-wider text-muted">Call Us</p>
+              <p className="font-bold text-sm">+234 815 937 6128</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+              <MapPin size={18} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-wider text-muted">Find Us</p>
+              <p className="font-bold text-sm">Lagos, Nigeria</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="bg-card p-6 rounded-[32px] text-center border-dashed border-2 border-muted/20">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Heart size={14} className="text-red-500 fill-red-500" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
+            Made with love in Nigeria
+          </span>
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.1em] text-muted opacity-40">
+          Mr. Krab v1.0.0 · 2026
+        </p>
       </div>
     </div>
   );

@@ -95,7 +95,7 @@ export default function Cart() {
            <ShoppingBag size={80} className="text-muted" />
         </div>
         <h2 className="text-3xl font-serif font-black italic mb-4">Your cart is empty</h2>
-        <p className="text-muted mb-10">Add some fresh catches to start your order journey!</p>
+        <p className="text-muted mb-10">Your cart is empty. Add some food to start your journey!</p>
         <Link to="/home" className="btn-primary w-full">Browse Menu</Link>
       </div>
     );
