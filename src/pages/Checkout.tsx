@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { useAuthStore } from '../store/useAuthStore';
-import { useCartStore } from '../store/useCartStore';
+import { useCartStore, getSubtotal } from '../store/useCartStore';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { formatCurrency, generateOrderNumber } from '../lib/utils';
@@ -16,7 +16,10 @@ export default function Checkout() {
   
   const profile = useAuthStore((state) => state.profile);
   const user = useAuthStore((state) => state.user);
-  const { items, clearCart, subtotal } = useCartStore();
+  
+  const items = useCartStore(s => s.items);
+  const clearCart = useCartStore(s => s.clearCart);
+  const subtotal = getSubtotal(items);
   
   const { data: walletBalance } = useQuery({
     queryKey: ['wallet-balance'],
@@ -81,10 +84,9 @@ export default function Checkout() {
       const orderItems = items.map(item => ({
         order_id: order.id,
         menu_item_id: item.menuItem.id,
-        variant_id: item.variant?.id,
         quantity: item.quantity,
-        unit_price: (item.menuItem.discount_price || item.menuItem.price) + (item.variant?.price_modifier || 0) + item.selectedAddons.reduce((sum, a) => sum + a.price, 0),
-        total_price: ((item.menuItem.discount_price || item.menuItem.price) + (item.variant?.price_modifier || 0) + item.selectedAddons.reduce((sum, a) => sum + a.price, 0)) * item.quantity,
+        unit_price: item.menuItem.discount_price || item.menuItem.price,
+        total_price: (item.menuItem.discount_price || item.menuItem.price) * item.quantity,
       }));
 
       const { error: itemsError } = await supabase
@@ -107,8 +109,16 @@ export default function Checkout() {
         });
 
       if (paymentError) throw paymentError;
+
+      // 4. Wallet Deduction
+      if (paymentMethod === 'wallet') {
+        const { data: deducted } = await supabase.rpc('deduct_wallet', { deduct_amount: total });
+        if (!deducted) {
+          toast.error('Wallet deduction failed. Please contact support.');
+        }
+      }
       
-      // 4. Update Promo Uses if applicable
+      // 5. Update Promo Uses if applicable
       if (appliedPromo) {
         await supabase.rpc('increment_promotion_uses', { promo_id: appliedPromo.id });
       }

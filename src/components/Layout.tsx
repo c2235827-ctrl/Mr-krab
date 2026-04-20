@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Home, Search, ClipboardList, User, ShoppingCart } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { useCartStore } from '../store/useCartStore';
+import { useCartStore, getTotalItems } from '../store/useCartStore';
 import { motion, AnimatePresence } from 'motion/react';
 
 const navItems = [
@@ -13,16 +13,17 @@ const navItems = [
 
 export default function Layout() {
   const location = useLocation();
-  const totalItems = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const items = useCartStore((state) => state.items);
+  const totalItems = getTotalItems(items);
   
   // Hide bottom nav on specific screens if needed (e.g. food detail)
   const isDetailScreen = location.pathname.startsWith('/item/');
   const isCartScreen = location.pathname === '/cart' || location.pathname === '/checkout';
 
   return (
-    <div className="min-h-screen bg-bg pb-24">
+    <div className="min-h-screen bg-bg">
       {/* Main Content */}
-      <main className="max-w-md mx-auto min-h-screen relative bg-bg shadow-sm">
+      <main className="max-w-md mx-auto min-h-screen relative bg-bg shadow-sm pb-24">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

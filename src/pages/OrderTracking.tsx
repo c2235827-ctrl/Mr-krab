@@ -176,10 +176,10 @@ export default function OrderTracking() {
          <button className="flex-1 btn-primary py-4">Call Restaurant</button>
          {order.status === 'delivered' && (
            <button 
-             onClick={() => navigate('/home')} // actually should navigate to review
+             onClick={() => navigate('/orders')}
              className="flex-1 bg-accent text-white py-4 rounded-xl font-bold"
            >
-             Rate Order
+             View All Orders
            </button>
          )}
       </div>

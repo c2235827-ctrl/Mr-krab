@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useCartStore } from '../store/useCartStore';
+import { useCartStore, getSubtotal } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
@@ -12,7 +12,10 @@ import { toast } from 'react-hot-toast';
 
 export default function Cart() {
   const navigate = useNavigate();
-  const { items, updateQuantity, removeItem, subtotal } = useCartStore();
+  const items = useCartStore(s => s.items);
+  const updateQuantity = useCartStore(s => s.updateQuantity);
+  const removeItem = useCartStore(s => s.removeItem);
+  const subtotal = getSubtotal(items);
   const profile = useAuthStore((state) => state.profile);
   
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup' | 'dine_in'>('delivery');
@@ -99,7 +102,7 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-bg pb-44 px-6 pt-6 flex flex-col gap-8">
+    <div className="min-h-screen bg-bg pb-12 px-6 pt-6 flex flex-col gap-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
@@ -141,7 +144,7 @@ export default function Cart() {
             >
               <div className="w-20 h-20 rounded-2xl overflow-hidden bg-card shrink-0">
                 <img 
-                  src={item.menuItem.image_url || undefined} 
+                  src={item.menuItem.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
                   alt={item.menuItem.name} 
                   className="w-full h-full object-cover" 
                   referrerPolicy="no-referrer"
@@ -149,12 +152,8 @@ export default function Cart() {
               </div>
               <div className="flex-1 flex flex-col">
                 <h4 className="font-serif font-black text-lg leading-tight">{item.menuItem.name}</h4>
-                <p className="text-xs text-muted mb-2">
-                  {item.variant?.name || 'Standard'} 
-                  {item.selectedAddons.length > 0 && ` • ${item.selectedAddons.map(a => a.name).join(', ')}`}
-                </p>
-                <span className="text-accent font-black">
-                  {formatCurrency(((item.menuItem.discount_price || item.menuItem.price) + (item.variant?.price_modifier || 0) + item.selectedAddons.reduce((aSum, a) => aSum + a.price, 0)) * item.quantity)}
+                <span className="text-accent font-black mt-2">
+                  {formatCurrency((item.menuItem.discount_price || item.menuItem.price) * item.quantity)}
                 </span>
               </div>
               <div className="flex flex-col items-end gap-3">

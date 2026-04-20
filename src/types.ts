@@ -50,21 +50,6 @@ export type MenuItem = {
   allergens: string[];
 };
 
-export type MenuItemVariant = {
-  id: string;
-  menu_item_id: string;
-  name: string;
-  price_modifier: number;
-  is_available: boolean;
-};
-
-export type Addon = {
-  id: string;
-  name: string;
-  price: number;
-  is_available: boolean;
-};
-
 export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered';
 
 export type Order = {
@@ -81,7 +66,6 @@ export type Order = {
   total: number;
   notes: string | null;
   estimated_delivery_time: string | null;
-  rider_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -90,13 +74,11 @@ export type OrderItem = {
   id: string;
   order_id: string;
   menu_item_id: string;
-  variant_id: string | null;
   quantity: number;
   unit_price: number;
   total_price: number;
   notes: string | null;
   menu_item?: MenuItem;
-  variant?: MenuItemVariant;
 };
 
 export type Payment = {
@@ -108,15 +90,6 @@ export type Payment = {
   status: 'pending' | 'success' | 'failed' | 'refunded';
   flutterwave_tx_ref: string | null;
   flutterwave_tx_id: string | null;
-};
-
-export type WalletTransaction = {
-  id: string;
-  wallet_id: string;
-  amount: number;
-  type: 'credit' | 'debit';
-  description: string;
-  created_at: string;
 };
 
 export type Notification = {
@@ -142,15 +115,4 @@ export type Promotion = {
   valid_from: string;
   valid_until: string;
   is_active: boolean;
-};
-
-export type Review = {
-  id: string;
-  user_id: string;
-  order_id: string;
-  menu_item_id: string;
-  rating: number;
-  comment: string | null;
-  created_at: string;
-  user?: Profile;
 };

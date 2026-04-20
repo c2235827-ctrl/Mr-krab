@@ -16,14 +16,14 @@ export default function Splash() {
   return (
     <div className="relative h-screen w-full bg-primary overflow-hidden flex flex-col items-center justify-between py-16 px-8 select-none">
       {/* Background Graphic/Image */}
-      <div className="absolute inset-0 z-0 opacity-40">
+      <div className="absolute inset-0 z-0 opacity-50">
         <img 
-          src="https://picsum.photos/seed/seafood/1080/1920?blur=2" 
-          alt="Seafood" 
+          src="https://images.unsplash.com/photo-1550461716-dbf266b2a8a7?w=1080" 
+          alt="Crab" 
           className="h-full w-full object-cover"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/50 via-primary/20 to-primary" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/30 to-primary" />
       </div>
 
       <div className="relative z-10 flex flex-col items-center mt-12">
@@ -33,6 +33,7 @@ export default function Splash() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center"
         >
+          <div className="text-7xl mb-4">🦀</div>
           <span className="text-accent text-sm font-bold tracking-[0.3em] uppercase mb-2 block">Premium Seafood</span>
           <h1 className="text-white text-6xl md:text-7xl font-black italic leading-tight">
             Mr. Krab

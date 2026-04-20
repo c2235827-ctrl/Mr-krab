@@ -54,7 +54,7 @@ export default function Notifications() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'order': return <ShoppingBag size={20} className="text-primary" />;
+      case 'order_update': return <ShoppingBag size={20} className="text-primary" />;
       case 'promo': return <Tag size={20} className="text-accent" />;
       default: return <Info size={20} className="text-muted" />;
     }
@@ -63,7 +63,7 @@ export default function Notifications() {
   if (isLoading) return <div className="p-10 text-center">Checking your crab alerts...</div>;
 
   return (
-    <div className="p-6 flex flex-col gap-8 mb-20">
+    <div className="p-6 flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />

@@ -11,8 +11,7 @@ import {
   Shield, 
   LogOut, 
   ChevronRight, 
-  Star, 
-  History, 
+  History,
   PlusCircle, 
   UserCircle,
   Smartphone,
@@ -37,14 +36,6 @@ export default function Profile() {
     queryKey: ['my-order-count'],
     queryFn: async () => {
       const { data } = await supabase.rpc('get_my_order_count');
-      return data ?? 0;
-    }
-  });
-
-  const { data: reviewCount } = useQuery({
-    queryKey: ['my-review-count'],
-    queryFn: async () => {
-      const { data } = await supabase.rpc('get_my_review_count');
       return data ?? 0;
     }
   });
@@ -78,7 +69,6 @@ export default function Profile() {
       items: [
         { icon: Wallet, label: 'Wallet Balance', value: formatCurrency(walletBalance ?? 0), path: '#', color: 'text-accent bg-accent/10' },
         { icon: History, label: 'Transaction History', path: '#', color: 'text-primary bg-primary/10' },
-        { icon: PlusCircle, label: 'Add Funds', path: '#', color: 'text-green-600 bg-green-50' },
       ]
     },
     {
@@ -86,7 +76,6 @@ export default function Profile() {
       items: [
         { icon: UserCircle, label: 'Personal Information', path: '/profile/personal-info' },
         { icon: MapPin, label: 'My Addresses', path: '/profile/addresses' },
-        { icon: Star, label: 'My Reviews', path: '/profile/reviews' },
       ]
     },
     {
@@ -106,7 +95,7 @@ export default function Profile() {
   ];
 
   return (
-    <div className="p-6 flex flex-col gap-8 mb-20">
+    <div className="p-6 flex flex-col gap-8">
       {/* Header / Hero */}
       <div className="flex flex-col items-center gap-4 mt-4">
         <div className="relative group">
@@ -125,14 +114,10 @@ export default function Profile() {
            <h2 className="text-3xl font-serif font-black italic">{profile?.full_name || 'Mr. Customer'}</h2>
            <p className="text-muted text-sm font-medium">{profile?.phone || 'No phone number'}</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 justify-center">
            <div className="bg-white px-6 py-3 rounded-2xl shadow-sm text-center">
               <span className="block text-[10px] text-muted font-black uppercase tracking-widest">Orders</span>
-              <span className="font-serif font-black text-lg">{orderCount ?? 0}</span>
-           </div>
-           <div className="bg-white px-6 py-3 rounded-2xl shadow-sm text-center">
-              <span className="block text-[10px] text-muted font-black uppercase tracking-widest">Reviews</span>
-              <span className="font-serif font-black text-lg">{reviewCount ?? 0}</span>
+              <span className="font-serif font-black text-lg text-primary">{orderCount ?? 0}</span>
            </div>
         </div>
       </div>

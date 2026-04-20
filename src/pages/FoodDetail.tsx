@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { MenuItem, MenuItemVariant, Addon } from '../types';
-import { formatCurrency, cn } from '../lib/utils';
+import { MenuItem } from '../types';
+import { formatCurrency } from '../lib/utils';
 import { motion } from 'motion/react';
 import { ArrowLeft, Share2, Star, Clock, Minus, Plus, Loader2 } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
@@ -15,8 +15,6 @@ export default function FoodDetail() {
   const addItem = useCartStore((state) => state.addItem);
   
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<MenuItemVariant | null>(null);
-  const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
 
   // Fetch Item
   const { data: item, isLoading } = useQuery<MenuItem>({
@@ -32,37 +30,18 @@ export default function FoodDetail() {
     },
   });
 
-  // Fetch Variants
-  const { data: variants } = useQuery<MenuItemVariant[]>({
-    queryKey: ['item-variants', item?.id],
+  const { data: ratingData } = useQuery({
+    queryKey: ['item-rating', item?.id],
     enabled: !!item?.id,
     queryFn: async () => {
       const { data } = await supabase
-        .from('menu_item_variants')
-        .select('*')
-        .eq('menu_item_id', item?.id)
-        .eq('is_available', true);
-      return data || [];
-    },
-  });
-
-  useEffect(() => {
-    if (variants && Array.isArray(variants) && variants.length > 0 && !selectedVariant) {
-      setSelectedVariant(variants[0]);
+        .from('reviews')
+        .select('rating')
+        .eq('menu_item_id', item!.id);
+      if (!data || data.length === 0) return { avg: null, count: 0 };
+      const avg = data.reduce((s, r) => s + r.rating, 0) / data.length;
+      return { avg: avg.toFixed(1), count: data.length };
     }
-  }, [variants, selectedVariant]);
-
-  // Fetch Addons
-  const { data: addons } = useQuery<Addon[]>({
-    queryKey: ['item-addons', item?.id],
-    enabled: !!item?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('menu_item_addons')
-        .select('addons(*)')
-        .eq('menu_item_id', item?.id);
-      return (data?.map(d => (d as any).addons) as Addon[]) || [];
-    },
   });
 
   if (isLoading) {
@@ -75,23 +54,12 @@ export default function FoodDetail() {
 
   if (!item) return <div className="p-10 text-center">Item not found</div>;
 
-  const currentPrice = (item.discount_price || item.price) + (selectedVariant?.price_modifier || 0);
-  const addonsTotal = selectedAddons.reduce((sum, a) => sum + a.price, 0);
-  const total = (currentPrice + addonsTotal) * quantity;
-
-  const toggleAddon = (addon: Addon) => {
-    setSelectedAddons(prev => 
-      prev.find(a => a.id === addon.id) 
-        ? prev.filter(a => a.id !== addon.id)
-        : [...prev, addon]
-    );
-  };
+  const currentPrice = item.discount_price || item.price;
+  const total = currentPrice * quantity;
 
   const handleAddToCart = () => {
     addItem({
       menuItem: item,
-      variant: selectedVariant,
-      selectedAddons,
       quantity,
     });
     toast.success('Added to cart!');
@@ -116,7 +84,7 @@ export default function FoodDetail() {
       {/* Hero Image */}
       <div className="relative w-full aspect-[4/5] max-h-[500px] overflow-hidden">
         <img 
-          src={item.image_url || undefined} 
+          src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
           className="w-full h-full object-cover" 
           referrerPolicy="no-referrer"
@@ -141,16 +109,16 @@ export default function FoodDetail() {
             <div className="flex flex-col items-end gap-1">
               <div className="flex items-center gap-1 text-[#FFB800]">
                 <Star size={18} fill="currentColor" />
-                <span className="text-primary font-black">4.9</span>
+                <span className="text-primary font-black">{ratingData?.avg ?? '—'}</span>
               </div>
-              <span className="text-xs text-muted">(120+ reviews)</span>
+              <span className="text-xs text-muted">({ratingData?.count ?? 0} reviews)</span>
             </div>
           </div>
 
           <div className="flex items-baseline gap-3 mb-6">
             <span className="text-3xl font-black text-accent">{formatCurrency(currentPrice)}</span>
             {item.discount_price && (
-              <span className="text-lg text-muted line-through font-bold">{formatCurrency(item.price + (selectedVariant?.price_modifier || 0))}</span>
+              <span className="text-lg text-muted line-through font-bold">{formatCurrency(item.price)}</span>
             )}
           </div>
 
@@ -170,7 +138,7 @@ export default function FoodDetail() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Rating</span>
-                  <span className="text-sm font-bold">4.9 / 5</span>
+                  <span className="text-sm font-bold">{ratingData?.avg ?? '—'} ({ratingData?.count ?? 0} reviews)</span>
                 </div>
              </div>
           </div>
@@ -183,75 +151,20 @@ export default function FoodDetail() {
             </p>
           </div>
 
-          {/* Ingredients/Allergens */}
-          <div className="mb-8">
-            <h3 className="text-lg font-black italic mb-4">Core Ingredients</h3>
-            <div className="flex flex-wrap gap-4">
-               {['Seaweed', 'Fresh Crab', 'Avocado', 'Vinegar'].map((ing, i) => (
-                 <div key={i} className="flex items-center gap-2 bg-card pl-1 pr-4 py-1 rounded-full border border-gray-100">
-                    <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-lg">
-                      {['🍙', '🦀', '🥑', '🍶'][i]}
-                    </div>
-                    <span className="text-sm font-bold">{ing}</span>
-                 </div>
-               ))}
-            </div>
-          </div>
-
-          {/* Variants Selector */}
-          {variants && variants.length > 0 && (
+          {/* Use item.allergens if available, else item.tags */}
+          {(item.allergens?.length > 0 || item.tags?.length > 0) && (
             <div className="mb-8">
-              <h3 className="text-lg font-black italic mb-4">Choose Size</h3>
-              <div className="flex gap-4">
-                {variants.map((v) => (
-                  <button
-                    key={v.id}
-                    onClick={() => setSelectedVariant(v)}
-                    className={cn(
-                      "flex-1 py-3 rounded-2xl border-2 transition-all font-bold",
-                      selectedVariant?.id === v.id 
-                        ? "border-primary bg-primary text-white" 
-                        : "border-gray-100 bg-white text-muted"
-                    )}
-                  >
-                    {v.name}
-                  </button>
+              <h3 className="text-lg font-black italic mb-4">Core Ingredients</h3>
+              <div className="flex flex-wrap gap-4">
+                {(item.allergens?.length > 0 ? item.allergens : item.tags)?.map((tag, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-card pl-3 pr-4 py-2 rounded-full border border-gray-100">
+                    <span className="text-sm font-bold capitalize">{tag}</span>
+                  </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Addons Checklist */}
-          {addons && addons.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-lg font-black italic mb-4">Add Extra Toppings</h3>
-              <div className="flex flex-col gap-3">
-                {addons.map((addon) => (
-                  <button
-                    key={addon.id}
-                    onClick={() => toggleAddon(addon)}
-                    className={cn(
-                      "flex items-center justify-between p-4 rounded-2xl border transition-all",
-                      selectedAddons.find(a => a.id === addon.id)
-                        ? "border-accent bg-accent/5"
-                        : "border-gray-100 bg-white"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors",
-                        selectedAddons.find(a => a.id === addon.id) ? "bg-accent border-accent" : "border-gray-200"
-                      )}>
-                        {selectedAddons.find(a => a.id === addon.id) && <Plus size={14} className="text-white" />}
-                      </div>
-                      <span className="font-bold">{addon.name}</span>
-                    </div>
-                    <span className="text-accent font-black">+{formatCurrency(addon.price)}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </motion.div>
 

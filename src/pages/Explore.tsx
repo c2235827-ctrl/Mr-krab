@@ -116,7 +116,7 @@ export default function Explore() {
                 key={item.id} 
                 item={item} 
                 onAdd={() => {
-                  addItem({ menuItem: item, variant: null, selectedAddons: [], quantity: 1 });
+                  addItem({ menuItem: item, quantity: 1 });
                   toast.success(`${item.name} added to cart!`);
                 }}
               />
@@ -138,11 +138,11 @@ export default function Explore() {
 
 function ExploreCard({ item, onAdd }: { item: MenuItem, onAdd: () => void; key?: string }) {
   return (
-    <div className="bg-white rounded-[32px] p-4 shadow-sm flex flex-col gap-3 group">
+    <div className="bg-white rounded-[32px] p-4 shadow-sm flex flex-col gap-3 group relative overflow-hidden">
       <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
         <div className="aspect-[4/5] rounded-[24px] overflow-hidden bg-card relative">
           <img 
-            src={item.image_url || undefined} 
+            src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
             alt={item.name} 
             className="w-full h-full object-cover transition-transform group-hover:scale-110" 
             referrerPolicy="no-referrer"
@@ -151,18 +151,18 @@ function ExploreCard({ item, onAdd }: { item: MenuItem, onAdd: () => void; key?:
             <Star size={10} className="text-accent" fill="currentColor" />
             <span className="text-[10px] font-black">4.9</span>
           </div>
+          <button 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
+            className="absolute bottom-3 right-3 w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+          >
+            <Plus size={18} />
+          </button>
         </div>
         <div className="flex flex-col">
-          <h4 className="font-serif font-black text-sm leading-tight mb-1 line-clamp-1">{item.name}</h4>
+          <h4 className="font-serif font-black text-sm italic leading-tight mb-1 line-clamp-1">{item.name}</h4>
           <span className="text-accent text-sm font-black">{formatCurrency(item.discount_price || item.price)}</span>
         </div>
       </Link>
-      <button 
-        onClick={(e) => { e.preventDefault(); onAdd(); }}
-        className="btn-accent border-4 border-white absolute -bottom-1 -right-1 z-10"
-      >
-        <Plus size={18} />
-      </button>
     </div>
   );
 }

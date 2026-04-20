@@ -145,7 +145,7 @@ export default function Home() {
                 key={item.id} 
                 item={item} 
                 onAdd={() => {
-                  addItem({ menuItem: item, variant: null, selectedAddons: [], quantity: 1 });
+                  addItem({ menuItem: item, quantity: 1 });
                   toast.success(`${item.name} added to cart!`);
                 }}
               />
@@ -170,7 +170,7 @@ export default function Home() {
               key={item.id} 
               item={item} 
               onAdd={() => {
-                addItem({ menuItem: item, variant: null, selectedAddons: [], quantity: 1 });
+                addItem({ menuItem: item, quantity: 1 });
                 toast.success(`${item.name} added to cart!`);
               }}
             />
@@ -188,7 +188,7 @@ export default function Home() {
                 key={item.id} 
                 item={item} 
                 onAdd={() => {
-                  addItem({ menuItem: item, variant: null, selectedAddons: [], quantity: 1 });
+                  addItem({ menuItem: item, quantity: 1 });
                   toast.success(`${item.name} added to cart!`);
                 }}
               />
@@ -202,10 +202,10 @@ export default function Home() {
 
 function FeaturedCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
   return (
-    <div className="relative min-w-[280px] bg-white rounded-[40px] p-6 shadow-sm flex flex-col justify-between overflow-hidden snap-center">
+    <div className="relative min-w-[300px] bg-white rounded-[40px] p-8 shadow-sm flex flex-col justify-between overflow-hidden snap-center">
       <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full overflow-hidden border-4 border-bg shadow-xl bg-card">
         <img 
-          src={item.image_url || undefined} 
+          src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
           className="w-full h-full object-cover" 
           referrerPolicy="no-referrer"
@@ -217,7 +217,7 @@ function FeaturedCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
           <Star size={14} fill="currentColor" />
           <span className="text-xs font-bold">4.8</span>
         </div>
-        <Link to={`/item/${item.slug}`} className="font-serif text-2xl font-black leading-tight max-w-[150px]">
+        <Link to={`/item/${item.slug}`} className="font-serif text-2xl font-black leading-tight max-w-[130px] line-clamp-2">
           {item.name}
         </Link>
       </div>
@@ -246,7 +246,7 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
       <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
         <div className="aspect-square rounded-[24px] overflow-hidden bg-card relative">
           <img 
-            src={item.image_url || undefined} 
+            src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
             alt={item.name} 
             className="w-full h-full object-cover transition-transform group-hover:scale-110" 
             referrerPolicy="no-referrer"
@@ -278,14 +278,14 @@ function DiscountCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
     <Link to={`/item/${item.slug}`} className="flex items-center gap-4 bg-white p-4 rounded-[24px] shadow-sm relative overflow-hidden group">
       <div className="w-20 h-20 rounded-2xl overflow-hidden bg-card shrink-0">
         <img 
-          src={item.image_url || undefined} 
+          src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
           referrerPolicy="no-referrer"
         />
       </div>
-      <div className="flex-1 flex flex-col">
-        <h4 className="font-serif font-black text-lg leading-tight">{item.name}</h4>
+      <div className="flex-1 flex flex-col min-w-0">
+        <h4 className="font-serif font-black text-lg leading-tight truncate">{item.name}</h4>
         <div className="flex items-baseline gap-2">
           <span className="text-accent font-black">{formatCurrency(item.discount_price!)}</span>
           <span className="text-xs text-muted line-through">{formatCurrency(item.price)}</span>
