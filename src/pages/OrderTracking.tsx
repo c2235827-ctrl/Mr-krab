@@ -11,7 +11,7 @@ const steps: { status: OrderStatus; label: string; icon: any; description: strin
   { status: 'pending', label: 'Order Placed', icon: ClipboardList, description: 'We have received your order' },
   { status: 'confirmed', label: 'Confirmed', icon: CheckCircle2, description: 'Chef is reviewing your order' },
   { status: 'preparing', label: 'Preparing', icon: Utensils, description: 'Your food is being cooked' },
-  { status: 'ready', label: 'Ready', icon: Package, description: 'Order is ready for pickup/delivery' },
+  { status: 'ready', label: 'Order Ready', icon: Package, description: 'Order prepared and packed' },
   { status: 'out_for_delivery', label: 'On its way', icon: Truck, description: 'Rider is bringing your order' },
   { status: 'delivered', label: 'Delivered', icon: Flag, description: 'Enjoy your meal! 🦀' },
 ];
@@ -25,7 +25,7 @@ export default function OrderTracking() {
 
   // Helper function
   const formatDeliveryAddress = (addr: any) => {
-    if (!addr) return 'Pickup at Restaurant';
+    if (!addr) return 'Delivery Address';
     if (typeof addr === 'string') return addr;
     return [addr.street, addr.city, addr.state].filter(Boolean).join(', ');
   };
@@ -173,7 +173,12 @@ export default function OrderTracking() {
 
       {/* Action Buttons */}
       <div className="flex gap-4 mb-10">
-         <button className="flex-1 btn-primary py-4">Call Restaurant</button>
+         <a 
+           href="tel:+2348159376128"
+           className="flex-1 btn-primary py-4 flex items-center justify-center p-0"
+         >
+           Call Restaurant
+         </a>
          {order.status === 'delivered' && (
            <button 
              onClick={() => navigate('/orders')}

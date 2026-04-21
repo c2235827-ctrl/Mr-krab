@@ -95,7 +95,7 @@ export default function Profile() {
   ];
 
   return (
-    <div className="p-6 flex flex-col gap-8">
+    <div className="p-6 flex flex-col gap-8 pb-32">
       {/* Header / Hero */}
       <div className="flex flex-col items-center gap-4 mt-4">
         <div className="relative group">
@@ -106,7 +106,7 @@ export default function Profile() {
                 className="w-full h-full object-cover"
               />
            </div>
-           <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-accent text-white rounded-2xl shadow-lg border-4 border-white flex items-center justify-center active:scale-95 transition-transform">
+           <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-accent text-white rounded-2xl shadow-lg border-4 border-white flex items-center justify-center active:opacity-75 transition-opacity">
              <PlusCircle size={20} />
            </button>
         </div>
@@ -169,7 +169,7 @@ export default function Profile() {
 
       <button
         onClick={handleLogout}
-        className="w-full flex items-center justify-center gap-3 py-5 bg-white text-red-500 rounded-[32px] font-bold shadow-sm transition-all active:scale-95 mt-4"
+        className="w-full flex items-center justify-center gap-3 py-5 bg-white text-red-500 rounded-[32px] font-bold shadow-sm transition-all active:opacity-75 mt-4"
       >
         <LogOut size={20} />
         Log out

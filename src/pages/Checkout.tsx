@@ -9,6 +9,8 @@ import { toast } from 'react-hot-toast';
 import { ArrowLeft, Wallet, CreditCard, Banknote, ShieldCheck, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { handleSupabaseError } from '../lib/error-handler';
+
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ export default function Checkout() {
     }
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<'flutterwave' | 'cash' | 'wallet'>('flutterwave');
+  const [paymentMethod, setPaymentMethod] = useState<'flutterwave' | 'wallet'>('flutterwave');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const fwConfig = {
@@ -103,7 +105,7 @@ export default function Checkout() {
           user_id: user?.id,
           amount: total,
           method: paymentMethod,
-          status: paymentMethod === 'cash' ? 'pending' : 'success',
+          status: 'success',
           flutterwave_tx_ref: paymentData?.tx_ref,
           flutterwave_tx_id: paymentData?.transaction_id?.toString(),
         });
@@ -112,9 +114,9 @@ export default function Checkout() {
 
       // 4. Wallet Deduction
       if (paymentMethod === 'wallet') {
-        const { data: deducted } = await supabase.rpc('deduct_wallet', { deduct_amount: total });
-        if (!deducted) {
-          toast.error('Wallet deduction failed. Please contact support.');
+        const { data: deducted, error: rpcError } = await supabase.rpc('deduct_wallet', { deduct_amount: total });
+        if (rpcError || !deducted) {
+          throw new Error('Wallet deduction failed. Insufficient funds or transaction error.');
         }
       }
       
@@ -127,13 +129,19 @@ export default function Checkout() {
       clearCart();
       navigate(`/tracking/${order.id}`);
     } catch (err: any) {
-      toast.error(`Checkout failed: ${err.message}`);
+      handleSupabaseError(err, 'Checkout');
     } finally {
       setIsProcessing(false);
     }
   }
 
   const handleProcessOrder = () => {
+    if (deliveryType === 'delivery' && !addressId) {
+      toast.error('Please select a delivery address');
+      navigate('/home');
+      return;
+    }
+
     if (paymentMethod === 'flutterwave') {
       handleFlutterwavePayment({
         callback: (response) => {
@@ -148,8 +156,6 @@ export default function Checkout() {
           toast('Payment abandoned', { icon: 'ℹ️' });
         },
       });
-    } else if (paymentMethod === 'cash') {
-      createOrder();
     } else if (paymentMethod === 'wallet') {
        if ((walletBalance ?? 0) < total) {
          toast.error('Insufficient wallet balance');
@@ -179,7 +185,6 @@ export default function Checkout() {
               {[
                 { id: 'flutterwave', label: 'Flutterwave (Card/USSD)', icon: CreditCard, color: 'text-accent bg-accent/10' },
                 { id: 'wallet', label: `Wallet Balance (${formatCurrency(walletBalance ?? 0)})`, icon: Wallet, color: 'text-primary bg-primary/10' },
-                { id: 'cash', label: 'Cash on Delivery', icon: Banknote, color: 'text-muted bg-card' }
               ].map((m) => (
                 <button
                   key={m.id}

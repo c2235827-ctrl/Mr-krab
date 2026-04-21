@@ -153,7 +153,7 @@ function ExploreCard({ item, onAdd }: { item: MenuItem, onAdd: () => void; key?:
           </div>
           <button 
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-            className="absolute bottom-3 right-3 w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+            className="absolute bottom-3 right-3 w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center shadow-lg active:opacity-75 transition-opacity"
           >
             <Plus size={18} />
           </button>

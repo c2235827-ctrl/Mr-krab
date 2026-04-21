@@ -26,11 +26,11 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white py-4 px-6 rounded-xl font-semibold transition-transform active:scale-95 disabled:opacity-50;
+    @apply bg-primary text-white py-3 px-6 rounded-xl font-semibold transition-opacity active:opacity-75 disabled:opacity-50 flex items-center justify-center gap-2;
   }
   
   .btn-accent {
-    @apply bg-accent text-white p-3 rounded-full shadow-lg shadow-accent/20 transition-transform active:scale-95;
+    @apply bg-accent text-white p-3 rounded-full shadow-lg shadow-accent/20 transition-opacity active:opacity-80;
   }
 
   .glass-card {

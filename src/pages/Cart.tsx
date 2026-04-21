@@ -18,7 +18,7 @@ export default function Cart() {
   const subtotal = getSubtotal(items);
   const profile = useAuthStore((state) => state.profile);
   
-  const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup' | 'dine_in'>('delivery');
+  const [deliveryType] = useState<'delivery'>('delivery');
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<Promotion | null>(null);
 
@@ -91,18 +91,32 @@ export default function Cart() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-8 text-center">
+        <button 
+          onClick={() => navigate('/home')}
+          className="absolute top-6 left-6 p-3 bg-white rounded-2xl shadow-sm active:opacity-80 transition-opacity"
+        >
+          <ArrowLeft size={24} />
+        </button>
         <div className="w-48 h-48 bg-card rounded-full flex items-center justify-center mb-8">
            <ShoppingBag size={80} className="text-muted" />
         </div>
         <h2 className="text-3xl font-serif font-black italic mb-4">Your cart is empty</h2>
-        <p className="text-muted mb-10">Your cart is empty. Add some food to start your journey!</p>
-        <Link to="/home" className="btn-primary w-full">Browse Menu</Link>
+        <p className="text-muted mb-10 text-sm">Looks like you haven't added anything to your cart yet. Let's find you something delicious! 🦀</p>
+        <div className="flex flex-col gap-3 w-full max-w-[280px]">
+          <Link to="/home" className="btn-primary w-full py-4">Explore Menu</Link>
+          <button 
+            onClick={() => navigate('/home')}
+            className="text-sm font-black uppercase tracking-widest text-muted hover:text-primary transition-colors"
+          >
+            Return to Home
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg pb-12 px-6 pt-6 flex flex-col gap-8">
+    <div className="min-h-screen bg-bg pb-40 px-6 pt-6 flex flex-col gap-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
@@ -112,24 +126,6 @@ export default function Cart() {
         <div className="w-12 h-12" /> {/* alignment */}
       </div>
 
-      {/* Delivery Type Toggle */}
-      <div className="bg-card p-1.5 rounded-[28px] flex gap-2">
-        {(['delivery', 'pickup', 'dine_in'] as const).map((type) => (
-          <button
-            key={type}
-            onClick={() => setDeliveryType(type)}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-3 rounded-[24px] text-sm font-bold transition-all",
-              deliveryType === type ? "bg-white shadow-sm text-primary" : "text-muted"
-            )}
-          >
-            {type === 'delivery' && <Truck size={18} />}
-            {type === 'pickup' && <ShoppingBag size={18} />}
-            {type === 'dine_in' && <Utensils size={18} />}
-            <span className="capitalize">{type}</span>
-          </button>
-        ))}
-      </div>
 
       {/* Items List */}
       <div className="flex flex-col gap-4">
@@ -205,7 +201,7 @@ export default function Cart() {
         </div>
         <button 
           onClick={handleApplyPromo}
-          className="bg-primary text-white px-8 rounded-2xl font-bold active:scale-95 transition-transform"
+          className="bg-primary text-white px-8 rounded-2xl font-bold active:opacity-80 transition-opacity"
         >
           Apply
         </button>
@@ -237,29 +233,39 @@ export default function Cart() {
       </div>
 
       {/* Checkout Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50">
+      <div className="fixed bottom-0 left-0 right-0 px-6 py-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50">
         <button 
-          onClick={() => navigate('/checkout', { 
-            state: { 
-              deliveryType, 
-              addressId: defaultAddress?.id, 
-              defaultAddress,
-              deliveryFee, 
-              discount, 
-              total, 
-              appliedPromo 
-            } 
-          })}
-          className="max-w-md mx-auto btn-primary w-full flex items-center justify-between"
+          onClick={() => {
+            if (!defaultAddress) {
+              toast.error('Please add a delivery address first! 🦀');
+              navigate('/profile');
+              return;
+            }
+            navigate('/checkout', { 
+              state: { 
+                deliveryType, 
+                addressId: defaultAddress?.id, 
+                defaultAddress,
+                deliveryFee, 
+                discount, 
+                total, 
+                appliedPromo 
+              } 
+            });
+          }}
+          className="max-w-md mx-auto btn-primary w-full h-[60px] flex items-center justify-between px-6"
         >
-          <span>Proceed to Payment</span>
-          <motion.div 
-            initial={{ x: 0 }}
-            animate={{ x: 5 }}
-            transition={{ repeat: Infinity, duration: 0.6, repeatType: 'reverse' }}
-          >
-            <ChevronRight size={24} />
-          </motion.div>
+          <span className="text-base font-black italic">Proceed to Payment</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold opacity-60">{formatCurrency(total)}</span>
+            <motion.div 
+              initial={{ x: 0 }}
+              animate={{ x: 5 }}
+              transition={{ repeat: Infinity, duration: 0.6, repeatType: 'reverse' }}
+            >
+              <ChevronRight size={20} />
+            </motion.div>
+          </div>
         </button>
       </div>
     </div>

@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Lock, User, Phone, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
+import { handleSupabaseError } from '../lib/error-handler';
+
 export default function Auth() {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
@@ -27,11 +29,13 @@ export default function Auth() {
         if (error) throw error;
 
         // Fetch profile and set auth state BEFORE navigating
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', data.user.id)
           .single();
+        
+        if (profileError) throw profileError;
 
         setAuth(data.user, profile);
         toast.success('Welcome back! 🦀');
@@ -50,7 +54,7 @@ export default function Auth() {
         setIsLogin(true);
       }
     } catch (error: any) {
-      toast.error(error.message);
+      handleSupabaseError(error, isLogin ? 'Login' : 'Signup');
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +150,7 @@ export default function Auth() {
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-4 w-full bg-primary text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2"
+          className="mt-4 w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 transition-all active:opacity-75 disabled:opacity-70 flex items-center justify-center gap-2"
         >
           {isLoading ? <Loader2 className="animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
         </button>

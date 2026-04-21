@@ -4,7 +4,7 @@ import { Order } from '../types';
 import { formatCurrency, cn } from '../lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, ChevronRight, Package, Truck, CheckCircle2, Search } from 'lucide-react';
+import { ClipboardList, ChevronRight, Package, Truck, CheckCircle2, Search, ArrowLeft } from 'lucide-react';
 
 export default function Orders() {
   const navigate = useNavigate();
@@ -44,11 +44,11 @@ export default function Orders() {
 
   return (
     <div className="p-6 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <button onClick={() => navigate('/home')} className="p-3 bg-white rounded-2xl shadow-sm">
+          <ArrowLeft size={24} />
+        </button>
         <h1 className="text-3xl font-black italic">My Orders</h1>
-        <div className="p-3 bg-white rounded-2xl shadow-sm">
-          <Search size={20} />
-        </div>
       </div>
 
       {orders?.length === 0 ? (

@@ -57,7 +57,7 @@ export type Order = {
   order_number: string;
   user_id: string;
   status: OrderStatus;
-  delivery_type: 'delivery' | 'pickup' | 'dine_in';
+  delivery_type: 'delivery';
   address_id: string | null;
   delivery_address: string | null;
   subtotal: number;
@@ -86,7 +86,7 @@ export type Payment = {
   order_id: string;
   user_id: string;
   amount: number;
-  method: 'flutterwave' | 'cash' | 'wallet';
+  method: 'flutterwave' | 'wallet';
   status: 'pending' | 'success' | 'failed' | 'refunded';
   flutterwave_tx_ref: string | null;
   flutterwave_tx_id: string | null;

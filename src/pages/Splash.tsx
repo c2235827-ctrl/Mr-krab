@@ -54,7 +54,7 @@ export default function Splash() {
           
           <button
             onClick={() => navigate('/auth')}
-            className="w-full bg-white text-primary py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-white/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full bg-white text-primary py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-white/10 transition-opacity active:opacity-90"
           >
             Get Started
           </button>

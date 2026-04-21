@@ -91,7 +91,7 @@ export default function About() {
           {[
             { icon: Utensils, title: 'Freshly Cooked', desc: 'Every order is made fresh — no reheating, ever.' },
             { icon: Clock, title: 'Fast Delivery', desc: 'Hot food at your door in 30–45 minutes.' },
-            { icon: MapPin, title: 'Order Anywhere', desc: 'Delivery, pickup, or dine in — your choice.' },
+            { icon: MapPin, title: 'Straight to You', desc: 'Fast delivery from our kitchen to your home.' },
           ].map((item, i) => (
             <div
               key={item.title}

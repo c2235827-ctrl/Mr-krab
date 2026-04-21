@@ -16,6 +16,21 @@ export default function Home() {
   const addItem = useCartStore((state) => state.addItem);
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
+  const { data: unreadCount } = useQuery({
+    queryKey: ['unread-notif-count'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return 0;
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      return count ?? 0;
+    },
+    refetchInterval: 30000, // refresh every 30 seconds
+  });
+
   // Fetch Categories
   const { data: categories } = useQuery<Category[]>({
     queryKey: ['categories'],
@@ -70,6 +85,19 @@ export default function Home() {
     },
   });
 
+  const { data: activePromos } = useQuery({
+    queryKey: ['active-promos'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('promotions')
+        .select('id, code, title, discount_type, discount_value, min_order_amount, valid_until')
+        .eq('is_active', true)
+        .or('valid_until.is.null,valid_until.gt.' + new Date().toISOString())
+        .order('created_at', { ascending: false });
+      return data || [];
+    },
+  });
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Top Bar */}
@@ -91,9 +119,13 @@ export default function Home() {
           <Link to="/explore" className="p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow">
             <Search size={20} />
           </Link>
-          <Link to="/notifications" className="p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow relative">
+          <Link to="/notifications" className="p-3 bg-white rounded-2xl shadow-sm relative">
             <Bell size={20} />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-white" />
+            {(unreadCount ?? 0) > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-[9px] font-black rounded-full flex items-center justify-center">
+                {unreadCount! > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </Link>
         </div>
       </div>
@@ -135,6 +167,55 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Promotions Banner */}
+      {activePromos && activePromos.length > 0 && activeCategory === 'all' && (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-lg font-black italic">🎁 Active Offers</h2>
+          <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-2">
+            {activePromos.map((promo) => (
+              <div
+                key={promo.id}
+                className="min-w-[260px] bg-primary text-white p-5 rounded-[32px] shadow-xl relative overflow-hidden snap-center flex flex-col gap-2"
+              >
+                {/* Background glow */}
+                <div className="absolute -top-8 -right-8 w-24 h-24 bg-accent/20 rounded-full" />
+                <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-white/5 rounded-full" />
+
+                <div className="relative z-10">
+                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                    Limited Offer
+                  </span>
+                  <h3 className="font-serif font-black text-xl leading-tight mt-1">
+                    {promo.title}
+                  </h3>
+                  <p className="text-sm opacity-80 mt-1">
+                    {promo.discount_type === 'percentage'
+                      ? `${promo.discount_value}% off`
+                      : `₦${promo.discount_value.toLocaleString()} off`}
+                    {promo.min_order_amount > 0
+                      ? ` orders above ₦${promo.min_order_amount.toLocaleString()}`
+                      : ''}
+                  </p>
+                </div>
+
+                <div className="relative z-10 flex items-center justify-between mt-2">
+                  <div className="bg-white/10 backdrop-blur px-3 py-1.5 rounded-xl">
+                    <span className="font-black font-mono tracking-widest text-accent text-sm">
+                      {promo.code}
+                    </span>
+                  </div>
+                  {promo.valid_until && (
+                    <span className="text-[10px] opacity-50 font-bold">
+                      Ends {new Date(promo.valid_until).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' })}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Featured Horizontal Scroll */}
       {featuredItems && featuredItems.length > 0 && activeCategory === 'all' && (
         <div className="flex flex-col gap-4">
@@ -164,16 +245,17 @@ export default function Home() {
             <Link to="/explore" className="text-accent font-bold text-sm">View All</Link>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
           {items?.map((item) => (
-            <MenuCard 
-              key={item.id} 
-              item={item} 
-              onAdd={() => {
-                addItem({ menuItem: item, quantity: 1 });
-                toast.success(`${item.name} added to cart!`);
-              }}
-            />
+            <div key={item.id} className="min-w-[160px] max-w-[160px] snap-center">
+              <MenuCard 
+                item={item} 
+                onAdd={() => {
+                  addItem({ menuItem: item, quantity: 1 });
+                  toast.success(`${item.name} added to cart!`);
+                }} 
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -242,9 +324,9 @@ function FeaturedCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
 
 function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
   return (
-    <div className="bg-white rounded-[32px] p-4 shadow-sm flex flex-col gap-3 group">
+    <div className="bg-white rounded-[32px] p-4 shadow-sm flex flex-col gap-3 group relative overflow-hidden">
       <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
-        <div className="aspect-square rounded-[24px] overflow-hidden bg-card relative">
+        <div className="h-36 rounded-[24px] overflow-hidden bg-card relative">
           <img 
             src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
             alt={item.name} 
@@ -256,19 +338,18 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
               OFFER
             </div>
           )}
+          <button 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
+            className="absolute bottom-2 right-2 w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center shadow-lg active:opacity-70 transition-opacity z-10"
+          >
+            <Plus size={20} />
+          </button>
         </div>
         <div className="flex flex-col">
-          <h4 className="font-serif font-black text-sm line-clamp-1">{item.name}</h4>
+          <h4 className="font-serif font-black text-sm italic leading-tight line-clamp-1 truncate">{item.name}</h4>
           <span className="text-accent text-sm font-black">{formatCurrency(item.discount_price || item.price)}</span>
         </div>
       </Link>
-      <button 
-        onClick={(e) => { e.preventDefault(); onAdd(); }} 
-        className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-1 active:scale-95 transition-transform"
-      >
-        <Plus size={16} />
-        <span className="text-xs font-bold capitalize">Add</span>
-      </button>
     </div>
   );
 }
@@ -293,7 +374,7 @@ function DiscountCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
       </div>
       <button 
         onClick={(e) => { e.preventDefault(); onAdd(); }} 
-        className="p-3 bg-primary text-white rounded-full active:scale-90 transition-transform"
+        className="p-3 bg-primary text-white rounded-full active:opacity-80 transition-opacity"
       >
         <Plus size={20} />
       </button>

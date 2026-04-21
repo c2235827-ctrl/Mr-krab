@@ -17,6 +17,7 @@ import Addresses from './pages/Profile/Addresses';
 import MyReviews from './pages/Profile/Reviews';
 import Security from './pages/Profile/Security';
 import About from './pages/Profile/About';
+import PrivacyPolicy from './pages/Profile/PrivacyPolicy';
 import FoodDetail from './pages/FoodDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -26,12 +27,25 @@ import Notifications from './pages/Notifications';
 // Components
 import Layout from './components/Layout';
 
+import { handleSupabaseError } from './lib/error-handler';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
+      retry: (failureCount, error: any) => {
+        // Don't retry if it's a 404 or something that won't fixed by retrying
+        if (error?.status === 404) return false;
+        // Retry more for network issues
+        if (error?.message?.toLowerCase().includes('failed to fetch')) return failureCount < 3;
+        return failureCount < 1;
+      },
     },
+    mutations: {
+      onError: (error: any) => {
+        handleSupabaseError(error);
+      }
+    }
   },
 });
 
@@ -61,10 +75,12 @@ export default function App() {
       // Initial session check
       supabase.auth.getSession().then(({ data: { session }, error }) => {
         if (error) {
-          // Handle common token errors by clearing local state
-          if (error.message.includes('refresh_token_not_found') || error.message.includes('Refresh Token Not Found')) {
+          const errMsg = error.message.toLowerCase();
+          if (errMsg.includes('refresh_token_not_found') || 
+              errMsg.includes('refresh token not found') || 
+              errMsg.includes('invalid refresh token')) {
             console.warn('Session expired or invalid, clearing local state...');
-            supabase.auth.signOut().then(() => setAuth(null, null));
+            supabase.auth.signOut().finally(() => setAuth(null, null));
             return;
           }
           throw error;
@@ -76,10 +92,17 @@ export default function App() {
           setAuth(null, null);
         }
       }).catch(err => {
-        if (err.message.includes('Supabase configuration missing')) {
+        const errMsg = err.message?.toLowerCase() || '';
+        if (errMsg.includes('supabase configuration missing')) {
           setConfigError(err.message);
-        } else if (err.message.includes('Refresh Token Not Found')) {
-          setAuth(null, null);
+        } else if (errMsg.includes('failed to fetch')) {
+          setConfigError('Could not connect to the server. Please check your internet connection.');
+        } else if (
+          errMsg.includes('refresh_token_not_found') || 
+          errMsg.includes('refresh token not found') || 
+          errMsg.includes('invalid refresh token')
+        ) {
+          supabase.auth.signOut().finally(() => setAuth(null, null));
         } else {
           console.error('Session check error:', err);
           setAuth(null, null);
@@ -163,6 +186,7 @@ export default function App() {
             <Route path="/profile/reviews" element={<MyReviews />} />
             <Route path="/profile/security" element={<Security />} />
             <Route path="/profile/about" element={<About />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

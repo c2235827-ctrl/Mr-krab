@@ -67,16 +67,38 @@ export default function FoodDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pb-32">
+    <div className="min-h-screen bg-bg pb-44">
       {/* Top Bar Overlay */}
       <div className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center max-w-md mx-auto">
         <button 
           onClick={() => navigate(-1)}
-          className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+          className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center active:opacity-80 transition-opacity"
         >
           <ArrowLeft size={24} />
         </button>
-        <button className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform">
+        <button 
+          onClick={async () => {
+            if (navigator.share) {
+              try {
+                await navigator.share({
+                  title: item.name,
+                  text: item.description,
+                  url: window.location.href,
+                });
+              } catch (err: any) {
+                // Ignore user cancellation errors
+                if (err.name !== 'AbortError') {
+                  toast.error('Could not share. Link copied instead!');
+                  navigator.clipboard.writeText(window.location.href);
+                }
+              }
+            } else {
+              navigator.clipboard.writeText(window.location.href);
+              toast.success('Share link copied!');
+            }
+          }}
+          className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center active:opacity-80 transition-opacity"
+        >
           <Share2 size={24} />
         </button>
       </div>
@@ -169,30 +191,30 @@ export default function FoodDetail() {
       </motion.div>
 
       {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50">
-        <div className="max-w-md mx-auto flex items-center justify-between gap-6">
-          <div className="flex items-center gap-4 bg-card px-4 py-2 rounded-2xl">
+      <div className="fixed bottom-0 left-0 right-0 px-6 py-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50">
+        <div className="max-w-md mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 bg-card px-2 py-1 rounded-2xl">
             <button 
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-10 h-10 flex items-center justify-center text-primary"
+              className="w-10 h-10 flex items-center justify-center text-primary active:opacity-60"
             >
-              <Minus size={20} />
+              <Minus size={18} />
             </button>
-            <span className="text-xl font-black w-6 text-center">{quantity}</span>
+            <span className="text-lg font-black w-6 text-center">{quantity}</span>
             <button 
               onClick={() => setQuantity(quantity + 1)}
-              className="w-10 h-10 flex items-center justify-center text-accent"
+              className="w-10 h-10 flex items-center justify-center text-accent active:opacity-60"
             >
-              <Plus size={20} />
+              <Plus size={18} />
             </button>
           </div>
           
           <button 
             onClick={handleAddToCart}
-            className="flex-1 btn-primary flex items-center justify-between"
+            className="flex-1 btn-primary h-[56px] flex items-center justify-between px-6"
           >
-            <span>Add to Cart</span>
-            <span>{formatCurrency(total)}</span>
+            <span className="font-black italic">Add to Cart</span>
+            <span className="text-sm font-bold opacity-60">{formatCurrency(total)}</span>
           </button>
         </div>
       </div>

@@ -106,7 +106,10 @@ export default function Security() {
         <div className="flex flex-col gap-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted ml-2">Privacy</h3>
           <div className="bg-white rounded-[32px] overflow-hidden shadow-sm">
-            <button className="w-full flex items-center justify-between p-6 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => navigate('/privacy-policy')}
+              className="w-full flex items-center justify-between p-6 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors text-left"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-muted/10 text-muted rounded-xl flex items-center justify-center">
                   <Shield size={20} />

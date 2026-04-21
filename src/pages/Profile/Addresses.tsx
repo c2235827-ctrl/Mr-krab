@@ -93,7 +93,7 @@ export default function Addresses() {
         </div>
         <button 
           onClick={() => setIsAddingAddress(true)}
-          className="p-3 bg-primary text-white rounded-2xl shadow-lg active:scale-95 transition-transform"
+          className="p-3 bg-primary text-white rounded-2xl shadow-lg active:opacity-80 transition-opacity"
         >
            <Plus size={24} />
         </button>
@@ -142,7 +142,7 @@ export default function Addresses() {
               </div>
               <button 
                 onClick={() => deleteAddress.mutate(addr.id)}
-                className="p-3 text-muted hover:text-red-500 active:scale-90 transition-all ml-4"
+                className="p-3 text-muted hover:text-red-500 active:opacity-75 transition-opacity ml-4"
               >
                 <Trash2 size={20} />
               </button>
@@ -166,7 +166,7 @@ export default function Addresses() {
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              className="bg-white w-full max-w-md rounded-[40px] p-8 relative z-10 shadow-2xl"
+              className="bg-white w-full max-w-md rounded-t-[40px] sm:rounded-[40px] p-8 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center mb-8">
                 <h2 className="text-2xl font-black italic">New Address 🦀</h2>

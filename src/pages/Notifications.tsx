@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Notification } from '../types';
 import { formatRelative } from 'date-fns';
@@ -7,10 +8,34 @@ import { Bell, ShoppingBag, Tag, Info, ArrowLeft, CheckCircle2, MoreVertical, Tr
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'react-hot-toast';
 import { cn } from '../lib/utils';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function Notifications() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('customer-notifications')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        queryClient.invalidateQueries({ queryKey: ['unread-notif-count'] });
+        toast(`🔔 ${payload.new.title}`, { duration: 5000 });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
 
   // Fetch Notifications
   const { data: notifications, isLoading } = useQuery<Notification[]>({
@@ -71,7 +96,7 @@ export default function Notifications() {
         <h1 className="text-3xl font-black italic">Alerts 🦀</h1>
         <button 
           onClick={() => markAsRead.mutate()}
-          className="p-3 bg-white rounded-2xl shadow-sm text-accent active:scale-95 transition-transform"
+          className="p-3 bg-white rounded-2xl shadow-sm text-accent active:opacity-75 transition-opacity"
         >
           <CheckCircle2 size={24} />
         </button>
