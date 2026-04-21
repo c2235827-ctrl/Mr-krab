@@ -225,10 +225,6 @@ export default function Home() {
               <FeaturedCard 
                 key={item.id} 
                 item={item} 
-                onAdd={() => {
-                  addItem({ menuItem: item, quantity: 1 });
-                  toast.success(`${item.name} added to cart!`);
-                }}
               />
             ))}
           </div>
@@ -282,10 +278,10 @@ export default function Home() {
   );
 }
 
-function FeaturedCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
+function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
   return (
-    <div className="relative min-w-[300px] bg-white rounded-[40px] p-8 shadow-sm flex flex-col justify-between overflow-hidden snap-center">
-      <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full overflow-hidden border-4 border-bg shadow-xl bg-card">
+    <div className="relative min-w-[240px] bg-white rounded-[32px] p-6 shadow-sm flex flex-col justify-between overflow-hidden snap-center">
+      <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full overflow-hidden border-4 border-bg shadow-xl bg-card">
         <img 
           src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
@@ -294,29 +290,23 @@ function FeaturedCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
         />
       </div>
       
-      <div className="flex flex-col gap-1 mt-32">
+      <div className="flex flex-col gap-1 mt-20">
         <div className="flex items-center gap-1 text-accent">
-          <Star size={14} fill="currentColor" />
-          <span className="text-xs font-bold">4.8</span>
+          <Star size={12} fill="currentColor" />
+          <span className="text-[10px] font-bold">4.8</span>
         </div>
-        <Link to={`/item/${item.slug}`} className="font-serif text-2xl font-black leading-tight max-w-[130px] line-clamp-2">
+        <Link to={`/item/${item.slug}`} className="font-serif text-xl font-black leading-tight max-w-[110px] line-clamp-2">
           {item.name}
         </Link>
       </div>
 
-      <div className="flex items-end justify-between mt-4">
+      <div className="flex items-end justify-between mt-3">
         <div className="flex items-baseline gap-2">
-          <span className="text-xl font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
+          <span className="text-lg font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
           {item.discount_price && (
-            <span className="text-sm text-muted line-through">{formatCurrency(item.price)}</span>
+            <span className="text-[10px] text-muted line-through">{formatCurrency(item.price)}</span>
           )}
         </div>
-        <button 
-          onClick={(e) => { e.preventDefault(); onAdd(); }} 
-          className="btn-accent"
-        >
-          <Plus size={24} />
-        </button>
       </div>
     </div>
   );
@@ -324,9 +314,9 @@ function FeaturedCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
 
 function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
   return (
-    <div className="bg-white rounded-[32px] p-4 shadow-sm flex flex-col gap-3 group relative overflow-hidden">
-      <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
-        <div className="h-36 rounded-[24px] overflow-hidden bg-card relative">
+    <div className="bg-white rounded-[32px] p-3 shadow-sm flex flex-col gap-2 group relative overflow-hidden">
+      <Link to={`/item/${item.slug}`} className="flex flex-col gap-2">
+        <div className="h-32 rounded-[20px] overflow-hidden bg-card relative">
           <img 
             src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
             alt={item.name} 
@@ -334,20 +324,22 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
             referrerPolicy="no-referrer"
           />
           {item.discount_price && (
-            <div className="absolute top-2 left-2 bg-accent text-white px-2 py-1 rounded-lg text-[10px] font-bold">
+            <div className="absolute top-2 left-2 bg-accent text-white px-2 py-1 rounded-lg text-[9px] font-bold">
               OFFER
             </div>
           )}
-          <button 
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-            className="absolute bottom-2 right-2 w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center shadow-lg active:opacity-70 transition-opacity z-10"
-          >
-            <Plus size={20} />
-          </button>
         </div>
         <div className="flex flex-col">
-          <h4 className="font-serif font-black text-sm italic leading-tight line-clamp-1 truncate">{item.name}</h4>
-          <span className="text-accent text-sm font-black">{formatCurrency(item.discount_price || item.price)}</span>
+          <h4 className="font-serif font-black text-xs italic leading-tight truncate mb-1">{item.name}</h4>
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-accent text-xs font-black">{formatCurrency(item.discount_price || item.price)}</span>
+            <button 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
+              className="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center shadow-lg active:opacity-70 transition-opacity"
+            >
+              <Plus size={16} />
+            </button>
+          </div>
         </div>
       </Link>
     </div>
