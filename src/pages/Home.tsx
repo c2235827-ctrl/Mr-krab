@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Bell, Plus, Star, MapPin } from 'lucide-react';
+import { Search, Bell, Plus, Star, MapPin, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Category, MenuItem } from '../types';
 import { formatCurrency, cn } from '../lib/utils';
@@ -28,10 +28,9 @@ export default function Home() {
         .eq('is_read', false);
       return count ?? 0;
     },
-    refetchInterval: 30000, // refresh every 30 seconds
+    refetchInterval: 30000,
   });
 
-  // Fetch Categories
   const { data: categories } = useQuery<Category[]>({
     queryKey: ['categories'],
     queryFn: async () => {
@@ -44,7 +43,6 @@ export default function Home() {
     },
   });
 
-  // Fetch Featured Items
   const { data: featuredItems } = useQuery<MenuItem[]>({
     queryKey: ['menu-featured'],
     queryFn: async () => {
@@ -58,7 +56,6 @@ export default function Home() {
     },
   });
 
-  // Fetch Items by Category
   const { data: items } = useQuery<MenuItem[]>({
     queryKey: ['menu-items', activeCategory],
     queryFn: async () => {
@@ -71,7 +68,6 @@ export default function Home() {
     },
   });
 
-  // Fetch Discount Items
   const { data: discountItems } = useQuery<MenuItem[]>({
     queryKey: ['menu-discounts'],
     queryFn: async () => {
@@ -90,7 +86,7 @@ export default function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from('promotions')
-        .select('id, code, title, discount_type, discount_value, min_order_amount, valid_until')
+        .select('*')
         .eq('is_active', true)
         .or('valid_until.is.null,valid_until.gt.' + new Date().toISOString())
         .order('created_at', { ascending: false });
@@ -98,8 +94,10 @@ export default function Home() {
     },
   });
 
+  const mainPromo = activePromos?.[0];
+
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-8 p-6 pb-24">
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <Link to="/profile" className="flex items-center gap-3">
@@ -112,17 +110,14 @@ export default function Home() {
           </div>
           <div>
             <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold">Good Day</p>
-            <h3 className="font-serif text-lg leading-tight">What would you like to order? 🦀</h3>
+            <h3 className="font-serif text-lg leading-tight italic font-black">Ready for a Feast? 🦀</h3>
           </div>
         </Link>
         <div className="flex gap-2">
-          <Link to="/explore" className="p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-            <Search size={20} />
-          </Link>
-          <Link to="/notifications" className="p-3 bg-white rounded-2xl shadow-sm relative">
+          <Link to="/notifications" className="p-3 bg-white rounded-2xl shadow-sm relative active:scale-95 transition-transform">
             <Bell size={20} />
             {(unreadCount ?? 0) > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-[9px] font-black rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white">
                 {unreadCount! > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -130,24 +125,75 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hero Search Placeholder (Visual only) */}
-      <div className="relative group" onClick={() => navigate('/explore')}>
+      {/* Hero Search Entry */}
+      <div 
+        className="relative group active:scale-[0.98] transition-all cursor-pointer" 
+        onClick={() => navigate('/explore')}
+      >
         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
           <Search size={18} className="text-muted" />
         </div>
-        <div className="w-full bg-card py-4 pl-12 pr-4 rounded-2xl text-muted font-medium cursor-pointer">
-          Find your favorite dishes...
+        <div className="w-full bg-white py-5 pl-12 pr-4 rounded-[28px] text-muted font-black border-2 border-gray-50 group-hover:border-accent transition-all shadow-sm">
+          Search for crab, sides...
+        </div>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-accent text-white p-2.5 rounded-xl shadow-lg">
+           <Search size={16} />
         </div>
       </div>
 
-      {/* Categories Horizontal Scroll */}
+      {/* Promotional Billboard - DYNAMIC */}
+      {mainPromo && (
+        <div className="flex flex-col gap-4">
+          <div className="relative h-48 rounded-[40px] overflow-hidden bg-primary shadow-2xl flex items-center justify-between p-8 group">
+            <div className="relative z-10 flex flex-col gap-2 max-w-[60%]">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Special Offer</span>
+              <h2 className="text-2xl font-serif font-black text-white leading-tight italic line-clamp-2">
+                {mainPromo.title} 🏎️
+              </h2>
+              <p className="text-white/60 text-[10px] font-medium leading-relaxed line-clamp-2">
+                Use code <span className="text-accent font-black">{mainPromo.code}</span> to get {mainPromo.discount_type === 'percentage' ? `${mainPromo.discount_value}%` : `₦${mainPromo.discount_value}`} off.
+              </p>
+              <button 
+                onClick={() => navigate('/explore')}
+                className="bg-accent text-white px-6 py-2 rounded-full font-black text-[10px] uppercase mt-2 w-fit active:scale-95 transition-transform"
+              >
+                Claim Now
+              </button>
+            </div>
+            
+            <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-primary/80 to-primary z-10" />
+                <img 
+                  src={(mainPromo as any).image_url || "https://images.unsplash.com/photo-1559739511-e12772a1cfdf?w=600&auto=format"} 
+                  alt="Promo" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                />
+            </div>
+
+            <div className="absolute -top-12 -left-12 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+          </div>
+        </div>
+      )}
+
+      {/* Categories */}
       <div className="flex flex-col gap-4">
-        <div className="horizontal-scroll gap-4 pb-2">
+        <div className="flex items-center justify-between">
+            <h2 className="text-xl font-black italic">Categories</h2>
+            {activeCategory !== 'all' && (
+              <button 
+                onClick={() => setActiveCategory('all')}
+                className="text-[10px] font-black uppercase text-accent tracking-widest bg-accent/10 px-3 py-1 rounded-full flex items-center gap-1"
+              >
+                <X size={10} /> Reset
+              </button>
+            )}
+        </div>
+        <div className="horizontal-scroll gap-4 pb-2 -mx-6 px-6">
           <button
             onClick={() => setActiveCategory('all')}
             className={cn(
-              "px-6 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap border border-gray-100",
-              activeCategory === 'all' ? "bg-primary text-white" : "bg-white text-primary"
+              "px-6 py-3 rounded-[20px] text-sm font-bold transition-all whitespace-nowrap border-2",
+              activeCategory === 'all' ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-gray-100 text-primary hover:border-accent/20"
             )}
           >
             All Items
@@ -157,8 +203,8 @@ export default function Home() {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={cn(
-                "px-6 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap border border-gray-100",
-                activeCategory === cat.id ? "bg-primary text-white" : "bg-white text-primary"
+                "px-6 py-3 rounded-[20px] text-sm font-bold transition-all whitespace-nowrap border-2",
+                activeCategory === cat.id ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-gray-100 text-primary hover:border-accent/20"
               )}
             >
               {cat.name}
@@ -167,65 +213,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Promotions Banner */}
-      {activePromos && activePromos.length > 0 && activeCategory === 'all' && (
-        <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-black italic">🎁 Active Offers</h2>
-          <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-2">
-            {activePromos.map((promo) => (
-              <div
-                key={promo.id}
-                className="min-w-[260px] bg-primary text-white p-5 rounded-[32px] shadow-xl relative overflow-hidden snap-center flex flex-col gap-2"
-              >
-                {/* Background glow */}
-                <div className="absolute -top-8 -right-8 w-24 h-24 bg-accent/20 rounded-full" />
-                <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-white/5 rounded-full" />
-
-                <div className="relative z-10">
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                    Limited Offer
-                  </span>
-                  <h3 className="font-serif font-black text-xl leading-tight mt-1">
-                    {promo.title}
-                  </h3>
-                  <p className="text-sm opacity-80 mt-1">
-                    {promo.discount_type === 'percentage'
-                      ? `${promo.discount_value}% off`
-                      : `₦${promo.discount_value.toLocaleString()} off`}
-                    {promo.min_order_amount > 0
-                      ? ` orders above ₦${promo.min_order_amount.toLocaleString()}`
-                      : ''}
-                  </p>
-                </div>
-
-                <div className="relative z-10 flex items-center justify-between mt-2">
-                  <div className="bg-white/10 backdrop-blur px-3 py-1.5 rounded-xl">
-                    <span className="font-black font-mono tracking-widest text-accent text-sm">
-                      {promo.code}
-                    </span>
-                  </div>
-                  {promo.valid_until && (
-                    <span className="text-[10px] opacity-50 font-bold">
-                      Ends {new Date(promo.valid_until).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' })}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Featured Horizontal Scroll */}
+      {/* Featured Items - Only on 'All' */}
       {featuredItems && featuredItems.length > 0 && activeCategory === 'all' && (
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-black italic">Chef's Selection</h2>
           <div className="horizontal-scroll gap-6 -mx-6 px-6 pb-4">
             {featuredItems.map((item) => (
-              <FeaturedCard 
-                key={item.id} 
-                item={item} 
-              />
+              <FeaturedCard key={item.id} item={item} />
             ))}
           </div>
         </div>
@@ -238,27 +232,35 @@ export default function Home() {
             {activeCategory === 'all' ? 'Popular Menu' : categories?.find(c => c.id === activeCategory)?.name}
           </h2>
           {activeCategory === 'all' && (
-            <Link to="/explore" className="text-accent font-bold text-sm">View All</Link>
+            <Link to="/explore" className="text-accent font-bold text-[10px] uppercase tracking-widest">See More</Link>
           )}
         </div>
-        <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
-          {items?.map((item) => (
-            <div key={item.id} className="min-w-[160px] max-w-[160px] snap-center">
-              <MenuCard 
-                item={item} 
-                onAdd={() => {
-                  addItem({ menuItem: item, quantity: 1 });
-                  toast.success(`${item.name} added to cart!`);
-                }} 
-              />
-            </div>
-          ))}
-        </div>
+        
+        {items?.length === 0 ? (
+          <div className="py-20 text-center bg-card rounded-[40px] opacity-50">
+            <span className="text-4xl">🦀</span>
+            <p className="text-xs font-black uppercase tracking-widest mt-4">Coming Soon to this category</p>
+          </div>
+        ) : (
+          <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
+            {items?.map((item) => (
+              <div key={item.id} className="min-w-[170px] max-w-[170px] snap-center">
+                <MenuCard 
+                  item={item} 
+                  onAdd={() => {
+                    addItem({ menuItem: item, quantity: 1 });
+                    toast.success(`${item.name} added!`);
+                  }} 
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Special for You Section */}
-      {discountItems && discountItems.length > 0 && (
-        <div className="flex flex-col gap-4 mt-4 mb-20">
+      {/* Special Items */}
+      {discountItems && discountItems.length > 0 && activeCategory === 'all' && (
+        <div className="flex flex-col gap-4 mt-4">
           <h2 className="text-2xl font-black italic">Special For You 🦀</h2>
           <div className="flex flex-col gap-4">
             {discountItems.map((item) => (
@@ -267,7 +269,7 @@ export default function Home() {
                 item={item} 
                 onAdd={() => {
                   addItem({ menuItem: item, quantity: 1 });
-                  toast.success(`${item.name} added to cart!`);
+                  toast.success(`${item.name} added!`);
                 }}
               />
             ))}
@@ -280,43 +282,44 @@ export default function Home() {
 
 function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
   return (
-    <div className="relative min-w-[240px] bg-white rounded-[32px] p-6 shadow-sm flex flex-col justify-between overflow-hidden snap-center">
-      <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full overflow-hidden border-4 border-bg shadow-xl bg-card">
+    <div className="relative min-w-[300px] h-40 bg-white rounded-[32px] p-6 shadow-sm flex items-center gap-4 overflow-hidden snap-center group">
+      {/* Rectangular Image */}
+      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-card shrink-0 relative z-10 shadow-md">
         <img 
           src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
-          className="w-full h-full object-cover" 
+          className="w-full h-full object-cover transition-transform group-hover:scale-110" 
           referrerPolicy="no-referrer"
         />
       </div>
-      
-      <div className="flex flex-col gap-1 mt-20">
-        <div className="flex items-center gap-1 text-accent">
-          <Star size={12} fill="currentColor" />
-          <span className="text-[10px] font-bold">4.8</span>
+
+      <div className="flex-1 flex flex-col justify-center min-w-0 relative z-10">
+        <div className="flex items-center gap-1 text-[#FFB800] mb-1">
+          <Star size={10} fill="currentColor" />
+          <span className="text-[10px] font-black text-primary">4.8</span>
         </div>
-        <Link to={`/item/${item.slug}`} className="font-serif text-xl font-black leading-tight max-w-[110px] line-clamp-2">
+        <Link to={`/item/${item.slug}`} className="font-serif text-lg font-black italic leading-tight line-clamp-2 text-primary">
           {item.name}
         </Link>
-      </div>
-
-      <div className="flex items-end justify-between mt-3">
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
-          {item.discount_price && (
-            <span className="text-[10px] text-muted line-through">{formatCurrency(item.price)}</span>
-          )}
+        <div className="flex items-baseline gap-2 mt-2">
+           <span className="text-base font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
+           {item.discount_price && (
+             <span className="text-[10px] text-muted line-through font-bold">{formatCurrency(item.price)}</span>
+           )}
         </div>
       </div>
+
+      {/* Abstract Design Element to match billboard */}
+      <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full -translate-y-1/2 translate-x-1/2" />
     </div>
   );
 }
 
 function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
   return (
-    <div className="bg-white rounded-[32px] p-3 shadow-sm flex flex-col gap-2 group relative overflow-hidden">
-      <Link to={`/item/${item.slug}`} className="flex flex-col gap-2">
-        <div className="h-32 rounded-[20px] overflow-hidden bg-card relative">
+    <div className="bg-white rounded-[32px] p-3 shadow-sm flex flex-col gap-3 group relative overflow-hidden active:scale-95 transition-transform">
+      <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
+        <div className="aspect-square rounded-[24px] overflow-hidden bg-card relative">
           <img 
             src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
             alt={item.name} 
@@ -324,18 +327,18 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
             referrerPolicy="no-referrer"
           />
           {item.discount_price && (
-            <div className="absolute top-2 left-2 bg-accent text-white px-2 py-1 rounded-lg text-[9px] font-bold">
-              OFFER
+            <div className="absolute top-2 left-2 bg-accent text-white px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter">
+              Offer
             </div>
           )}
         </div>
-        <div className="flex flex-col">
-          <h4 className="font-serif font-black text-xs italic leading-tight truncate mb-1">{item.name}</h4>
-          <div className="flex items-center justify-between gap-1">
-            <span className="text-accent text-xs font-black">{formatCurrency(item.discount_price || item.price)}</span>
+        <div className="flex flex-col px-1">
+          <h4 className="font-serif font-black text-sm italic leading-tight truncate mb-1">{item.name}</h4>
+          <div className="flex items-center justify-between">
+            <span className="text-accent text-sm font-black">{formatCurrency(item.discount_price || item.price)}</span>
             <button 
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-              className="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center shadow-lg active:opacity-70 transition-opacity"
+              className="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-transform"
             >
               <Plus size={16} />
             </button>
@@ -348,27 +351,28 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
 
 function DiscountCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
   return (
-    <Link to={`/item/${item.slug}`} className="flex items-center gap-4 bg-white p-4 rounded-[24px] shadow-sm relative overflow-hidden group">
-      <div className="w-20 h-20 rounded-2xl overflow-hidden bg-card shrink-0">
+    <Link to={`/item/${item.slug}`} className="flex items-center gap-5 bg-white p-5 rounded-[32px] shadow-sm relative overflow-hidden group active:scale-[0.98] transition-transform">
+      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-card shrink-0 shadow-inner">
         <img 
           src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
           referrerPolicy="no-referrer"
         />
       </div>
       <div className="flex-1 flex flex-col min-w-0">
-        <h4 className="font-serif font-black text-lg leading-tight truncate">{item.name}</h4>
-        <div className="flex items-baseline gap-2">
-          <span className="text-accent font-black">{formatCurrency(item.discount_price!)}</span>
-          <span className="text-xs text-muted line-through">{formatCurrency(item.price)}</span>
+        <span className="text-[10px] font-black text-accent uppercase tracking-widest mb-1 italic">Special Deal</span>
+        <h4 className="font-serif font-black text-xl leading-tight truncate text-primary">{item.name}</h4>
+        <div className="flex items-baseline gap-2 mt-1">
+          <span className="text-xl font-black text-accent">{formatCurrency(item.discount_price!)}</span>
+          <span className="text-xs text-muted line-through font-bold">{formatCurrency(item.price)}</span>
         </div>
       </div>
       <button 
         onClick={(e) => { e.preventDefault(); onAdd(); }} 
-        className="p-3 bg-primary text-white rounded-full active:opacity-80 transition-opacity"
+        className="w-12 h-12 bg-accent text-white rounded-2xl flex items-center justify-center shadow-xl active:scale-90 transition-transform"
       >
-        <Plus size={20} />
+        <Plus size={24} />
       </button>
     </Link>
   );

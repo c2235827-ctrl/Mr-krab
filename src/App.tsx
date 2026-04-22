@@ -79,9 +79,15 @@ export default function App() {
           const errMsg = error.message.toLowerCase();
           if (errMsg.includes('refresh_token_not_found') || 
               errMsg.includes('refresh token not found') || 
-              errMsg.includes('invalid refresh token')) {
+              errMsg.includes('invalid refresh token') ||
+              errMsg.includes('invalid_grant')) {
             console.warn('Session expired or invalid, clearing local state...');
-            supabase.auth.signOut().finally(() => setAuth(null, null));
+            // Use window.localStorage.clear() as a fallback to ensure everything is wiped
+            window.localStorage.removeItem('supabase.auth.token');
+            supabase.auth.signOut().finally(() => {
+              setAuth(null, null);
+              window.location.href = '/auth';
+            });
             return;
           }
           throw error;
@@ -113,6 +119,15 @@ export default function App() {
       // Auth listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
+          if (event === 'SIGNED_OUT') {
+            setAuth(null, null);
+            return;
+          }
+
+          if (event === 'TOKEN_REFRESHED') {
+            console.log('Session token refreshed');
+          }
+
           if (session) {
             fetchProfile(session.user.id, session.user);
           } else {

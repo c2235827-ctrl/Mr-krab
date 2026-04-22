@@ -8,8 +8,9 @@ import { supabase } from '../lib/supabase';
 
 const navItems = [
   { icon: Home, label: 'Home', path: '/home' },
-  { icon: Bell, label: 'Alerts', path: '/notifications' },
+  { icon: Search, label: 'Explore', path: '/explore' },
   { icon: ClipboardList, label: 'Orders', path: '/orders' },
+  { icon: Bell, label: 'Alerts', path: '/notifications' },
   { icon: User, label: 'Profile', path: '/profile' },
 ];
 

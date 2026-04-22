@@ -7,12 +7,17 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Search, Filter, ArrowLeft, Plus, Star, X } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { toast } from 'react-hot-toast';
+import { motion } from 'motion/react';
 
 export default function Explore() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const addItem = useCartStore((state) => state.addItem);
+
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterPriceRange, setFilterPriceRange] = useState<[number, number]>([0, 10000]);
+  const [filterMinRating, setFilterMinRating] = useState<number>(0);
 
   // Fetch Categories
   const { data: categories } = useQuery<Category[]>({
@@ -25,7 +30,7 @@ export default function Explore() {
 
   // Fetch Search Results
   const { data: items, isLoading } = useQuery<MenuItem[]>({
-    queryKey: ['explore-items', activeCategory, searchQuery],
+    queryKey: ['explore-items', activeCategory, searchQuery, filterPriceRange, filterMinRating],
     queryFn: async () => {
       let query = supabase.from('menu_items').select('*').eq('is_available', true);
       
@@ -36,6 +41,9 @@ export default function Explore() {
       if (searchQuery) {
         query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
+
+      // Applied Filters
+      query = query.gte('price', filterPriceRange[0]).lte('price', filterPriceRange[1]);
       
       const { data } = await query.order('name');
       return data || [];
@@ -43,7 +51,7 @@ export default function Explore() {
   });
 
   return (
-    <div className="p-6 flex flex-col gap-6">
+    <div className="p-6 flex flex-col gap-6 relative">
       {/* Search Header */}
       <div className="flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
@@ -98,7 +106,15 @@ export default function Explore() {
       <div className="flex flex-col gap-4 mb-24">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-black italic">Found {items?.length || 0} items</h2>
-          <button className="flex items-center gap-2 text-sm font-bold text-muted">
+          <button 
+            onClick={() => setIsFilterOpen(true)}
+            className={cn(
+              "flex items-center gap-2 text-sm font-bold py-2 px-4 rounded-xl transition-colors",
+              (filterPriceRange[0] > 0 || filterPriceRange[1] < 10000 || filterMinRating > 0) 
+                ? "bg-accent text-white" 
+                : "text-muted bg-white border border-gray-50"
+            )}
+          >
             <Filter size={16} /> Filter
           </button>
         </div>
@@ -129,9 +145,106 @@ export default function Explore() {
              <div className="text-6xl mb-4 opacity-20">🦀</div>
              <h3 className="text-lg font-bold">No results found</h3>
              <p className="text-sm text-muted">Try searching for something else or browse all.</p>
+             {(filterMinRating > 0 || filterPriceRange[0] > 0) && (
+               <button 
+                onClick={() => {
+                  setFilterPriceRange([0, 10000]);
+                  setFilterMinRating(0);
+                  setSearchQuery('');
+                  setActiveCategory('all');
+                }}
+                className="mt-4 text-accent font-bold"
+               >
+                 Clear all filters
+               </button>
+             )}
           </div>
         )}
       </div>
+
+      {/* Filter Modal/Sheet */}
+      {isFilterOpen && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-0 sm:p-6">
+          <div 
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+            onClick={() => setIsFilterOpen(false)}
+          />
+          <motion.div 
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            className="relative w-full max-w-md bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl flex flex-col gap-8 pb-12 sm:pb-8"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black italic">Filters</h2>
+              <button onClick={() => setIsFilterOpen(false)} className="p-2 bg-card rounded-full">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-6">
+               <div className="flex flex-col gap-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Price Range</h3>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 bg-card p-4 rounded-2xl">
+                      <span className="text-[10px] text-muted font-bold block uppercase mb-1">Min (₦)</span>
+                      <input 
+                        type="number" 
+                        value={filterPriceRange[0]} 
+                        onChange={(e) => setFilterPriceRange([Number(e.target.value), filterPriceRange[1]])}
+                        className="bg-transparent font-black w-full"
+                      />
+                    </div>
+                    <div className="flex-1 bg-card p-4 rounded-2xl">
+                      <span className="text-[10px] text-muted font-bold block uppercase mb-1">Max (₦)</span>
+                      <input 
+                        type="number" 
+                        value={filterPriceRange[1]} 
+                        onChange={(e) => setFilterPriceRange([filterPriceRange[0], Number(e.target.value)])}
+                        className="bg-transparent font-black w-full"
+                      />
+                    </div>
+                  </div>
+               </div>
+
+               <div className="flex flex-col gap-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Minimum Rating</h3>
+                  <div className="flex items-center gap-2">
+                    {[0, 3, 4, 4.5].map((rating) => (
+                      <button
+                        key={rating}
+                        onClick={() => setFilterMinRating(rating)}
+                        className={cn(
+                          "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
+                          filterMinRating === rating ? "bg-accent border-accent text-white shadow-lg" : "bg-white border-gray-100 text-primary"
+                        )}
+                      >
+                        {rating === 0 ? 'Any' : `${rating}+ ★`}
+                      </button>
+                    ))}
+                  </div>
+               </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button 
+                onClick={() => {
+                  setFilterPriceRange([0, 10000]);
+                  setFilterMinRating(0);
+                }}
+                className="flex-1 py-4 font-bold text-muted hover:text-primary transition-colors"
+              >
+                Reset
+              </button>
+              <button 
+                onClick={() => setIsFilterOpen(false)}
+                className="flex-2 btn-primary py-4"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

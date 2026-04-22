@@ -10,8 +10,14 @@ export function handleSupabaseError(error: any, operation?: string) {
     return;
   }
 
-  if (message.includes('jwt expired') || message.includes('invalid refresh token')) {
+  if (message.includes('jwt expired') || 
+      message.includes('invalid refresh token') || 
+      message.includes('refresh token not found') ||
+      message.includes('refresh_token_not_found') ||
+      message.includes('invalid_grant')) {
     // This is handled globally in App.tsx but good to have here
+    console.warn('Handling auth terminal error in global handler');
+    window.localStorage.removeItem('supabase.auth.token');
     return;
   }
 
