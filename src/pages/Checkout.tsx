@@ -35,20 +35,21 @@ export default function Checkout() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const fwConfig = {
-    public_key: import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || '',
+    public_key: import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY 
+      || 'FLWPUBK_TEST-bada1e713350586cc6e1d8e165d8b064-X',
     tx_ref: `KRB-${Date.now()}`,
     amount: total,
     currency: 'NGN',
-    payment_options: 'card,mobilemoney,ussd',
+    payment_options: 'card,ussd,banktransfer',
     customer: {
       email: user?.email || '',
       phone_number: profile?.phone || '',
       name: profile?.full_name || '',
     },
     customizations: {
-      title: 'Mr. Krab Restaurant',
-      description: 'Payment for Mr. Krab order',
-      logo: 'https://api.dicebear.com/7.x/initials/svg?seed=MK',
+      title: 'Mr. Krab',
+      description: 'Food order payment',
+      logo: 'https://api.dicebear.com/7.x/initials/svg?seed=MK&backgroundColor=111111',
     },
   };
 
@@ -145,10 +146,13 @@ export default function Checkout() {
     if (paymentMethod === 'flutterwave') {
       handleFlutterwavePayment({
         callback: (response) => {
-          if (response.status === 'successful') {
+          const status = response.status?.toLowerCase();
+          // Handle all common success status strings from Flutterwave
+          if (status === 'successful' || status === 'success' || status === 'completed') {
             createOrder(response);
           } else {
-            toast.error('Payment was not successful');
+            console.error('[Checkout] Payment failed. Trace ID:', response.transaction_id || 'N/A', 'Status:', status);
+            toast.error(`Payment ${status || 'failed'}. If you were debited, contact support with ref: ${response.tx_ref}`);
           }
           closePaymentModal();
         },

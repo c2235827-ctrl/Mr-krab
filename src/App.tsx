@@ -18,6 +18,7 @@ import MyReviews from './pages/Profile/Reviews';
 import Security from './pages/Profile/Security';
 import About from './pages/Profile/About';
 import PrivacyPolicy from './pages/Profile/PrivacyPolicy';
+import Wallet from './pages/Profile/Wallet';
 import FoodDetail from './pages/FoodDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -186,6 +187,7 @@ export default function App() {
             <Route path="/profile/reviews" element={<MyReviews />} />
             <Route path="/profile/security" element={<Security />} />
             <Route path="/profile/about" element={<About />} />
+            <Route path="/profile/wallet" element={<Wallet />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Route>
           

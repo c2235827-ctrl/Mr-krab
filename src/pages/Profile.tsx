@@ -67,8 +67,8 @@ export default function Profile() {
     {
       title: 'Finance',
       items: [
-        { icon: Wallet, label: 'Wallet Balance', value: formatCurrency(walletBalance ?? 0), path: '#', color: 'text-accent bg-accent/10' },
-        { icon: History, label: 'Transaction History', path: '#', color: 'text-primary bg-primary/10' },
+        { icon: Wallet, label: 'Wallet Balance', value: formatCurrency(walletBalance ?? 0), path: '/profile/wallet', color: 'text-accent bg-accent/10' },
+        { icon: History, label: 'Transaction History', path: '/profile/wallet', color: 'text-primary bg-primary/10' },
       ]
     },
     {
