@@ -125,22 +125,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hero Search Entry */}
-      <div 
-        className="relative group active:scale-[0.98] transition-all cursor-pointer" 
-        onClick={() => navigate('/explore')}
-      >
-        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-          <Search size={18} className="text-muted" />
-        </div>
-        <div className="w-full bg-white py-5 pl-12 pr-4 rounded-[28px] text-muted font-black border-2 border-gray-50 group-hover:border-accent transition-all shadow-sm">
-          Search for crab, sides...
-        </div>
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-accent text-white p-2.5 rounded-xl shadow-lg">
-           <Search size={16} />
-        </div>
-      </div>
-
       {/* Promotional Billboard - DYNAMIC */}
       {mainPromo && (
         <div className="flex flex-col gap-4">
@@ -154,7 +138,6 @@ export default function Home() {
                 Use code <span className="text-accent font-black">{mainPromo.code}</span> to get {mainPromo.discount_type === 'percentage' ? `${mainPromo.discount_value}%` : `₦${mainPromo.discount_value}`} off.
               </p>
               <button 
-                onClick={() => navigate('/explore')}
                 className="bg-accent text-white px-6 py-2 rounded-full font-black text-[10px] uppercase mt-2 w-fit active:scale-95 transition-transform"
               >
                 Claim Now
@@ -231,9 +214,6 @@ export default function Home() {
           <h2 className="text-2xl font-black italic">
             {activeCategory === 'all' ? 'Popular Menu' : categories?.find(c => c.id === activeCategory)?.name}
           </h2>
-          {activeCategory === 'all' && (
-            <Link to="/explore" className="text-accent font-bold text-[10px] uppercase tracking-widest">See More</Link>
-          )}
         </div>
         
         {items?.length === 0 ? (

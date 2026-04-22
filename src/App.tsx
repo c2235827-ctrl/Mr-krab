@@ -9,7 +9,6 @@ import { useAuthStore } from './store/useAuthStore';
 import Splash from './pages/Splash';
 import Auth from './pages/Auth';
 import Home from './pages/Home';
-import Explore from './pages/Explore';
 import Orders from './pages/Orders';
 import ProfilePage from './pages/Profile';
 import PersonalInfo from './pages/Profile/PersonalInfo';
@@ -189,7 +188,6 @@ export default function App() {
           
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/home" element={<Home />} />
-            <Route path="/explore" element={<Explore />} />
             <Route path="/item/:slug" element={<FoodDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
