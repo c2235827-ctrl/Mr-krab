@@ -18,6 +18,20 @@ export default function Notifications() {
   useEffect(() => {
     if (!user) return;
 
+    // Mark as read when entering the page
+    const markAllAsRead = async () => {
+      await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['unread-notif-count'] });
+    };
+
+    markAllAsRead();
+
     const channel = supabase
       .channel('customer-notifications')
       .on('postgres_changes', {
@@ -37,16 +51,18 @@ export default function Notifications() {
     };
   }, [user, queryClient]);
 
-  // Fetch Notifications
   const { data: notifications, isLoading } = useQuery<Notification[]>({
     queryKey: ['notifications'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
+      
       if (error) throw error;
       return data || [];
     },
@@ -85,7 +101,25 @@ export default function Notifications() {
     }
   };
 
-  if (isLoading) return <div className="p-10 text-center">Checking your crab alerts...</div>;
+  const formatBody = (body: string) => {
+    // Replaces patterns like "20.00%" with "20%"
+    return body.replace(/(\d+)\.00%/g, '$1%');
+  };
+
+  if (isLoading) return (
+    <div className="p-6 flex flex-col gap-8">
+      <div className="flex items-center justify-between">
+        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
+          <ArrowLeft size={24} />
+        </button>
+        <h1 className="text-3xl font-black italic">Alerts 🦀</h1>
+        <div className="w-12" />
+      </div>
+      <div className="p-10 text-center text-muted font-bold animate-pulse italic">
+        Checking your crab alerts...
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 flex flex-col gap-8">
@@ -102,7 +136,7 @@ export default function Notifications() {
         </button>
       </div>
 
-      {notifications?.length === 0 ? (
+      {!isLoading && notifications?.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-32 h-32 bg-card rounded-full flex items-center justify-center mb-6">
             <Bell size={48} className="text-muted" />
@@ -137,7 +171,7 @@ export default function Notifications() {
                     </span>
                   </div>
                   <p className="text-xs text-muted leading-relaxed line-clamp-2">
-                    {notif.body}
+                    {formatBody(notif.body)}
                   </p>
                 </div>
                 <button 

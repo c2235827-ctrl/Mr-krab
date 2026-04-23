@@ -43,9 +43,9 @@ export default function Cart() {
   let discount = 0;
   if (appliedPromo) {
     if (appliedPromo.discount_type === 'percentage') {
-      discount = (subtotal * appliedPromo.discount_value) / 100;
+      discount = (subtotal * Number(appliedPromo.discount_value)) / 100;
     } else {
-      discount = appliedPromo.discount_value;
+      discount = Number(appliedPromo.discount_value);
     }
   }
 
@@ -76,8 +76,8 @@ export default function Cart() {
         return;
       }
 
-      if (subtotal < promo.min_order_amount) {
-        toast.error(`Minimum order value is ${formatCurrency(promo.min_order_amount)}`);
+      if (subtotal < Number(promo.min_order_amount)) {
+        toast.error(`Minimum order value is ${formatCurrency(Number(promo.min_order_amount))}`);
         return;
       }
 

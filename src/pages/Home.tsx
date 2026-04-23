@@ -84,13 +84,17 @@ export default function Home() {
   const { data: activePromos } = useQuery({
     queryKey: ['active-promos'],
     queryFn: async () => {
+      const now = new Date().toISOString();
       const { data } = await supabase
         .from('promotions')
         .select('*')
         .eq('is_active', true)
-        .or('valid_until.is.null,valid_until.gt.' + new Date().toISOString())
+        .lte('valid_from', now)
+        .or('valid_until.is.null,valid_until.gt.' + now)
         .order('created_at', { ascending: false });
-      return data || [];
+      
+      // Filter out promos that have reached their max uses
+      return (data || []).filter(p => !p.max_uses || p.uses_count < p.max_uses);
     },
   });
 
@@ -125,53 +129,62 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Promotional Billboard - DYNAMIC */}
-      {mainPromo && (
+      {/* Promotional Billboard - DYNAMIC ROLL */}
+      {activePromos && activePromos.length > 0 && (
         <div className="flex flex-col gap-4">
-          <div className="relative h-56 rounded-[48px] overflow-hidden bg-primary shadow-2xl flex items-center justify-between p-8 group">
-            <div className="relative z-10 flex flex-col gap-2 max-w-[65%]">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Special Offer</span>
-                <div className="h-[1px] w-8 bg-accent/30" />
-              </div>
-              
-              <div className="flex flex-col gap-0 mb-2">
-                <span className="text-5xl font-serif font-black text-white italic leading-none">
-                  {mainPromo.discount_type === 'percentage' ? `${mainPromo.discount_value}%` : `₦${mainPromo.discount_value}`}
-                </span>
-                <span className="text-lg font-serif font-black text-accent italic -mt-1">OFF YOUR ORDER</span>
-              </div>
+          <div className="horizontal-scroll gap-4 pb-2 -mx-6 px-6">
+            {activePromos.map((promo) => (
+              <div 
+                key={promo.id}
+                className="relative min-w-[320px] max-w-[320px] h-60 rounded-[40px] overflow-hidden bg-primary shadow-2xl flex items-center p-8 group transition-all"
+              >
+                <div className="relative z-20 flex flex-col gap-2 w-full">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Special Offer</span>
+                    <div className="h-[1px] w-8 bg-accent/30" />
+                  </div>
+                  
+                  <div className="flex flex-col gap-0 mb-1">
+                    <span className="text-4xl font-serif font-black text-white italic leading-none">
+                      {promo.discount_type === 'percentage' ? `${Number(promo.discount_value)}%` : formatCurrency(Number(promo.discount_value))}
+                    </span>
+                    <span className="text-sm font-serif font-black text-accent italic">OFF YOUR ORDER</span>
+                  </div>
 
-              <h2 className="text-sm font-bold text-white/90 leading-tight">
-                {mainPromo.title}
-              </h2>
-              
-              <div className="flex items-center gap-3 mt-2">
-                <div className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/10">
-                   <p className="text-white text-[10px] font-black uppercase tracking-widest">
-                     CODE: <span className="text-accent">{mainPromo.code}</span>
-                   </p>
+                  <h2 className="text-xs font-bold text-white/90 leading-tight line-clamp-2">
+                    {promo.title}
+                  </h2>
+                  
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/10">
+                       <p className="text-white text-[9px] font-black uppercase tracking-widest">
+                         CODE: <span className="text-accent">{promo.code}</span>
+                       </p>
+                    </div>
+                    <button 
+                      className="bg-accent text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase shadow-lg shadow-accent/20 active:scale-95 transition-transform"
+                    >
+                      Use
+                    </button>
+                  </div>
                 </div>
-                <button 
-                  className="bg-accent text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-accent/20 active:scale-95 transition-transform"
-                >
-                  Claim
-                </button>
-              </div>
-            </div>
-            
-            <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-primary/95 to-primary z-10" />
-                <img 
-                  src={(mainPromo as any).image_url || "https://images.unsplash.com/photo-1559739511-e12772a1cfdf?w=600&auto=format"} 
-                  alt="Promo" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-60"
-                />
-            </div>
+                
+                {/* Image background with better visibility */}
+                <div className="absolute right-0 top-0 bottom-0 w-3/5 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-l from-transparent via-primary/60 to-primary z-10" />
+                    <img 
+                      src={(promo as any).image_url || "https://images.unsplash.com/photo-1559739511-e12772a1cfdf?w=600&auto=format"} 
+                      alt="Promo" 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-40 group-hover:opacity-60"
+                      referrerPolicy="no-referrer"
+                    />
+                </div>
 
-            {/* Abstract Decorative Elements */}
-            <div className="absolute -top-12 -left-12 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
-            <div className="absolute bottom-4 right-4 w-12 h-12 border-2 border-white/10 rounded-full animate-pulse" />
+                {/* Abstract Decorative Elements */}
+                <div className="absolute -top-12 -left-12 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+                <div className="absolute top-1/2 -right-4 w-24 h-24 bg-accent/5 rounded-full blur-2xl" />
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -260,16 +273,17 @@ export default function Home() {
       {discountItems && discountItems.length > 0 && activeCategory === 'all' && (
         <div className="flex flex-col gap-4 mt-4">
           <h2 className="text-2xl font-black italic">Special For You 🦀</h2>
-          <div className="flex flex-col gap-4">
+          <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
             {discountItems.map((item) => (
-              <DiscountCard 
-                key={item.id} 
-                item={item} 
-                onAdd={() => {
-                  addItem({ menuItem: item, quantity: 1 });
-                  toast.success(`${item.name} added!`);
-                }}
-              />
+              <div key={item.id} className="min-w-[280px] snap-center">
+                <DiscountCard 
+                  item={item} 
+                  onAdd={() => {
+                    addItem({ menuItem: item, quantity: 1 });
+                    toast.success(`${item.name} added!`);
+                  }}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -280,36 +294,49 @@ export default function Home() {
 
 function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
   return (
-    <div className="relative min-w-[300px] h-40 bg-white rounded-[32px] p-6 shadow-sm flex items-center gap-4 overflow-hidden snap-center group">
-      {/* Rectangular Image */}
-      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-card shrink-0 relative z-10 shadow-md">
+    <Link 
+      to={`/item/${item.slug}`}
+      className="relative min-w-[280px] h-44 bg-white rounded-[40px] p-5 shadow-sm flex items-center gap-5 overflow-hidden snap-center group active:scale-95 transition-transform"
+    >
+      {/* Large Image with Badge */}
+      <div className="w-24 h-24 rounded-3xl overflow-hidden bg-card shrink-0 relative z-10 shadow-lg">
         <img 
           src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
-          className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+          className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" 
           referrerPolicy="no-referrer"
         />
+        {item.discount_price && (
+          <div className="absolute top-1 right-1 bg-accent text-white w-8 h-8 rounded-full flex items-center justify-center text-[8px] font-black italic shadow-lg">
+            -{Math.round(((item.price - item.discount_price) / item.price) * 100)}%
+          </div>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col justify-center min-w-0 relative z-10">
-        <div className="flex items-center gap-1 text-[#FFB800] mb-1">
-          <Star size={10} fill="currentColor" />
-          <span className="text-[10px] font-black text-primary">4.8</span>
+        <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-0.5 text-[#FFB800]">
+            <Star size={10} fill="currentColor" />
+            <span className="text-[10px] font-black text-primary">4.8</span>
+          </div>
+          <span className="text-[8px] text-muted font-bold uppercase tracking-widest bg-card px-2 py-0.5 rounded-full">Chef Choice</span>
         </div>
-        <Link to={`/item/${item.slug}`} className="font-serif text-lg font-black italic leading-tight line-clamp-2 text-primary">
+        
+        <h3 className="font-serif text-lg font-black italic leading-tight line-clamp-2 text-primary mb-2">
           {item.name}
-        </Link>
-        <div className="flex items-baseline gap-2 mt-2">
-           <span className="text-base font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
-           {item.discount_price && (
-             <span className="text-[10px] text-muted line-through font-bold">{formatCurrency(item.price)}</span>
-           )}
+        </h3>
+
+        <div className="flex items-baseline gap-2">
+           <span className="text-lg font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
         </div>
       </div>
 
-      {/* Abstract Design Element to match billboard */}
-      <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-    </div>
+      {/* Background Decor */}
+      <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-accent/5 rounded-full blur-xl group-hover:bg-accent/10 transition-colors" />
+      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+        <Star size={64} className="text-primary" />
+      </div>
+    </Link>
   );
 }
 
