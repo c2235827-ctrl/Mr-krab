@@ -5,7 +5,6 @@ import { supabase } from '../lib/supabase';
 import { formatCurrency, cn } from '../lib/utils';
 import { 
   User, 
-  Wallet, 
   MapPin, 
   Bell, 
   Shield, 
@@ -23,14 +22,6 @@ import { motion } from 'motion/react';
 export default function Profile() {
   const { profile, user, setAuth, signOut } = useAuthStore();
   const navigate = useNavigate();
-
-  const { data: walletBalance } = useQuery({
-    queryKey: ['wallet-balance'],
-    queryFn: async () => {
-      const { data } = await supabase.rpc('get_my_wallet_balance');
-      return data ?? 0;
-    }
-  });
 
   const { data: orderCount } = useQuery({
     queryKey: ['my-order-count'],
@@ -67,8 +58,7 @@ export default function Profile() {
     {
       title: 'Finance',
       items: [
-        { icon: Wallet, label: 'Wallet Balance', value: formatCurrency(walletBalance ?? 0), path: '/profile/wallet', color: 'text-accent bg-accent/10' },
-        { icon: History, label: 'Transaction History', path: '/profile/wallet', color: 'text-primary bg-primary/10' },
+        { icon: History, label: 'Transaction History', path: '/profile/transactions', color: 'text-primary bg-primary/10' },
       ]
     },
     {

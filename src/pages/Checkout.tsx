@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore, getSubtotal } from '../store/useCartStore';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { formatCurrency, generateOrderNumber } from '../lib/utils';
 import { toast } from 'react-hot-toast';
@@ -14,6 +14,7 @@ import { handleSupabaseError } from '../lib/error-handler';
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { deliveryType, addressId, defaultAddress, deliveryFee, discount, total, appliedPromo } = location.state || {};
   
   const profile = useAuthStore((state) => state.profile);
@@ -23,15 +24,8 @@ export default function Checkout() {
   const clearCart = useCartStore(s => s.clearCart);
   const subtotal = getSubtotal(items);
   
-  const { data: walletBalance } = useQuery({
-    queryKey: ['wallet-balance'],
-    queryFn: async () => {
-      const { data } = await supabase.rpc('get_my_wallet_balance');
-      return data ?? 0;
-    }
-  });
 
-  const [paymentMethod, setPaymentMethod] = useState<'flutterwave' | 'wallet'>('flutterwave');
+  const [paymentMethod, setPaymentMethod] = useState<'flutterwave'>('flutterwave');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const fwConfig = {
@@ -113,18 +107,14 @@ export default function Checkout() {
 
       if (paymentError) throw paymentError;
 
-      // 4. Wallet Deduction
-      if (paymentMethod === 'wallet') {
-        const { data: deducted, error: rpcError } = await supabase.rpc('deduct_wallet', { deduct_amount: total });
-        if (rpcError || !deducted) {
-          throw new Error('Wallet deduction failed. Insufficient funds or transaction error.');
-        }
-      }
+      // 4. Wallet Deduction - REMOED
       
       // 5. Update Promo Uses if applicable
       if (appliedPromo) {
         await supabase.rpc('increment_promotion_uses', { promo_id: appliedPromo.id });
       }
+
+      await queryClient.invalidateQueries({ queryKey: ['orders-history'] });
 
       toast.success('Order placed successfully! 🚢');
       clearCart();
@@ -143,30 +133,22 @@ export default function Checkout() {
       return;
     }
 
-    if (paymentMethod === 'flutterwave') {
-      handleFlutterwavePayment({
-        callback: (response) => {
-          const status = response.status?.toLowerCase();
-          // Handle all common success status strings from Flutterwave
-          if (status === 'successful' || status === 'success' || status === 'completed') {
-            createOrder(response);
-          } else {
-            console.error('[Checkout] Payment failed. Trace ID:', response.transaction_id || 'N/A', 'Status:', status);
-            toast.error(`Payment ${status || 'failed'}. If you were debited, contact support with ref: ${response.tx_ref}`);
-          }
-          closePaymentModal();
-        },
-        onClose: () => {
-          toast('Payment abandoned', { icon: 'ℹ️' });
-        },
-      });
-    } else if (paymentMethod === 'wallet') {
-       if ((walletBalance ?? 0) < total) {
-         toast.error('Insufficient wallet balance');
-         return;
-       }
-       createOrder();
-    }
+    handleFlutterwavePayment({
+      callback: (response) => {
+        const status = response.status?.toLowerCase();
+        // Handle all common success status strings from Flutterwave
+        if (status === 'successful' || status === 'success' || status === 'completed') {
+          createOrder(response);
+        } else {
+          console.error('[Checkout] Payment failed. Trace ID:', response.transaction_id || 'N/A', 'Status:', status);
+          toast.error(`Payment ${status || 'failed'}. If you were debited, contact support with ref: ${response.tx_ref}`);
+        }
+        closePaymentModal();
+      },
+      onClose: () => {
+        toast('Payment abandoned', { icon: 'ℹ️' });
+      },
+    });
   };
 
   if (!total) return <div className="p-10 text-center">Invalid checkout state</div>;
@@ -184,28 +166,19 @@ export default function Checkout() {
 
       <div className="flex flex-col gap-6">
         <div>
-           <h2 className="text-lg font-black italic mb-4">Select Payment Method</h2>
+           <h2 className="text-lg font-black italic mb-4">Payment Method</h2>
            <div className="flex flex-col gap-3">
-              {[
-                { id: 'flutterwave', label: 'Flutterwave (Card/USSD)', icon: CreditCard, color: 'text-accent bg-accent/10' },
-                { id: 'wallet', label: `Wallet Balance (${formatCurrency(walletBalance ?? 0)})`, icon: Wallet, color: 'text-primary bg-primary/10' },
-              ].map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setPaymentMethod(m.id as any)}
-                  className={`flex items-center justify-between p-5 rounded-[28px] border-2 transition-all ${paymentMethod === m.id ? 'border-primary bg-white shadow-md' : 'border-gray-100 bg-white opacity-60'}`}
-                >
-                  <div className="flex items-center gap-4">
-                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${m.color}`}>
-                        <m.icon size={24} />
-                     </div>
-                     <span className="font-bold">{m.label}</span>
-                  </div>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === m.id ? 'border-accent bg-accent' : 'border-gray-200'}`}>
-                    {paymentMethod === m.id && <div className="w-2 h-2 bg-white rounded-full" />}
-                  </div>
-                </button>
-              ))}
+              <div className="flex items-center justify-between p-5 rounded-[28px] border-2 border-primary bg-white shadow-md transition-all">
+                <div className="flex items-center gap-4">
+                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-accent bg-accent/10">
+                      <CreditCard size={24} />
+                   </div>
+                   <span className="font-bold">Flutterwave (Card/USSD)</span>
+                </div>
+                <div className="w-6 h-6 rounded-full border-2 border-accent bg-accent flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                </div>
+              </div>
            </div>
         </div>
 

@@ -128,32 +128,50 @@ export default function Home() {
       {/* Promotional Billboard - DYNAMIC */}
       {mainPromo && (
         <div className="flex flex-col gap-4">
-          <div className="relative h-48 rounded-[40px] overflow-hidden bg-primary shadow-2xl flex items-center justify-between p-8 group">
-            <div className="relative z-10 flex flex-col gap-2 max-w-[60%]">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Special Offer</span>
-              <h2 className="text-2xl font-serif font-black text-white leading-tight italic line-clamp-2">
-                {mainPromo.title} 🏎️
+          <div className="relative h-56 rounded-[48px] overflow-hidden bg-primary shadow-2xl flex items-center justify-between p-8 group">
+            <div className="relative z-10 flex flex-col gap-2 max-w-[65%]">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Special Offer</span>
+                <div className="h-[1px] w-8 bg-accent/30" />
+              </div>
+              
+              <div className="flex flex-col gap-0 mb-2">
+                <span className="text-5xl font-serif font-black text-white italic leading-none">
+                  {mainPromo.discount_type === 'percentage' ? `${mainPromo.discount_value}%` : `₦${mainPromo.discount_value}`}
+                </span>
+                <span className="text-lg font-serif font-black text-accent italic -mt-1">OFF YOUR ORDER</span>
+              </div>
+
+              <h2 className="text-sm font-bold text-white/90 leading-tight">
+                {mainPromo.title}
               </h2>
-              <p className="text-white/60 text-[10px] font-medium leading-relaxed line-clamp-2">
-                Use code <span className="text-accent font-black">{mainPromo.code}</span> to get {mainPromo.discount_type === 'percentage' ? `${mainPromo.discount_value}%` : `₦${mainPromo.discount_value}`} off.
-              </p>
-              <button 
-                className="bg-accent text-white px-6 py-2 rounded-full font-black text-[10px] uppercase mt-2 w-fit active:scale-95 transition-transform"
-              >
-                Claim Now
-              </button>
+              
+              <div className="flex items-center gap-3 mt-2">
+                <div className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/10">
+                   <p className="text-white text-[10px] font-black uppercase tracking-widest">
+                     CODE: <span className="text-accent">{mainPromo.code}</span>
+                   </p>
+                </div>
+                <button 
+                  className="bg-accent text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-accent/20 active:scale-95 transition-transform"
+                >
+                  Claim
+                </button>
+              </div>
             </div>
             
             <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-primary/80 to-primary z-10" />
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent via-primary/95 to-primary z-10" />
                 <img 
                   src={(mainPromo as any).image_url || "https://images.unsplash.com/photo-1559739511-e12772a1cfdf?w=600&auto=format"} 
                   alt="Promo" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-60"
                 />
             </div>
 
+            {/* Abstract Decorative Elements */}
             <div className="absolute -top-12 -left-12 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+            <div className="absolute bottom-4 right-4 w-12 h-12 border-2 border-white/10 rounded-full animate-pulse" />
           </div>
         </div>
       )}
@@ -307,8 +325,8 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
             referrerPolicy="no-referrer"
           />
           {item.discount_price && (
-            <div className="absolute top-2 left-2 bg-accent text-white px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter">
-              Offer
+            <div className="absolute top-3 left-3 bg-accent text-white px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-tighter shadow-lg shadow-accent/20">
+              {Math.round(((item.price - item.discount_price) / item.price) * 100)}% OFF
             </div>
           )}
         </div>
@@ -330,15 +348,20 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
 }
 
 function DiscountCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
+  const discountPercent = Math.round(((item.price - item.discount_price!) / item.price) * 100);
+  
   return (
     <Link to={`/item/${item.slug}`} className="flex items-center gap-5 bg-white p-5 rounded-[32px] shadow-sm relative overflow-hidden group active:scale-[0.98] transition-transform">
-      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-card shrink-0 shadow-inner">
+      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-card shrink-0 shadow-inner relative">
         <img 
           src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
           referrerPolicy="no-referrer"
         />
+        <div className="absolute top-1 right-1 bg-accent text-white w-8 h-8 rounded-full flex items-center justify-center text-[8px] font-black italic shadow-lg">
+          -{discountPercent}%
+        </div>
       </div>
       <div className="flex-1 flex flex-col min-w-0">
         <span className="text-[10px] font-black text-accent uppercase tracking-widest mb-1 italic">Special Deal</span>

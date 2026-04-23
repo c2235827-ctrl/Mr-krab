@@ -15,9 +15,21 @@ export function handleSupabaseError(error: any, operation?: string) {
       message.includes('refresh token not found') ||
       message.includes('refresh_token_not_found') ||
       message.includes('invalid_grant')) {
-    // This is handled globally in App.tsx but good to have here
-    console.warn('Handling auth terminal error in global handler');
-    window.localStorage.removeItem('supabase.auth.token');
+    
+    const isRecovery = window.location.hash.includes('access_token') || 
+                      window.location.search.includes('type=recovery') ||
+                      window.location.pathname === '/reset-password';
+
+    if (!isRecovery) {
+      // Clear storage and trigger a clean state reset
+      window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
+      window.localStorage.removeItem('supabase.auth.token');
+      
+      // Only redirect if not already on /auth
+      if (window.location.pathname !== '/auth') {
+        window.location.href = '/auth';
+      }
+    }
     return;
   }
 

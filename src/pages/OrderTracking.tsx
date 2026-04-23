@@ -30,12 +30,18 @@ export default function OrderTracking() {
     return [addr.street, addr.city, addr.state].filter(Boolean).join(', ');
   };
 
-  const { data: order, isLoading } = useQuery<Order>({
+  const { data: order, isLoading } = useQuery<Order & { order_items: any[] }>({
     queryKey: ['order', orderId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+          *,
+          order_items (
+            *,
+            menu_item:menu_items (*)
+          )
+        `)
         .eq('id', orderId)
         .single();
       if (error) throw error;
@@ -169,6 +175,49 @@ export default function OrderTracking() {
              </div>
            );
          })}
+      </div>
+
+      {/* Transaction Details (Items) */}
+      <div className="bg-white p-8 rounded-[40px] shadow-sm flex flex-col gap-6">
+         <div className="flex items-center justify-between">
+           <h3 className="text-xl font-black italic">Order Summary</h3>
+           <span className="text-accent font-black">{formatCurrency(order.total)}</span>
+         </div>
+         
+         <div className="flex flex-col gap-4">
+            {order.order_items?.map((item) => (
+              <div key={item.id} className="flex justify-between items-center bg-card p-4 rounded-2xl">
+                <div className="flex items-center gap-3">
+                   <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black">
+                     {item.quantity}x
+                   </div>
+                   <span className="font-bold text-sm line-clamp-1">{item.menu_item?.name}</span>
+                </div>
+                <span className="font-bold text-xs text-muted">{formatCurrency(item.total_price)}</span>
+              </div>
+            ))}
+         </div>
+
+         <div className="h-px bg-gray-100" />
+
+         <div className="flex flex-col gap-2">
+           <div className="flex justify-between text-xs font-medium text-muted">
+             <span>Subtotal</span>
+             <span>{formatCurrency(order.subtotal)}</span>
+           </div>
+           {order.delivery_fee > 0 && (
+             <div className="flex justify-between text-xs font-medium text-muted">
+               <span>Delivery Fee</span>
+               <span>{formatCurrency(order.delivery_fee)}</span>
+             </div>
+           )}
+           {order.discount_amount > 0 && (
+             <div className="flex justify-between text-xs font-medium text-accent">
+               <span>Discount</span>
+               <span>-{formatCurrency(order.discount_amount)}</span>
+             </div>
+           )}
+         </div>
       </div>
 
       {/* Action Buttons */}

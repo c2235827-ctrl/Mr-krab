@@ -140,7 +140,12 @@ export default function FoodDetail() {
           <div className="flex items-baseline gap-3 mb-6">
             <span className="text-3xl font-black text-accent">{formatCurrency(currentPrice)}</span>
             {item.discount_price && (
-              <span className="text-lg text-muted line-through font-bold">{formatCurrency(item.price)}</span>
+              <>
+                <span className="text-lg text-muted line-through font-bold">{formatCurrency(item.price)}</span>
+                <span className="text-xs bg-accent text-white px-3 py-1 rounded-full font-black italic">
+                  {Math.round(((item.price - item.discount_price) / item.price) * 100)}% OFF
+                </span>
+              </>
             )}
           </div>
 

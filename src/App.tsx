@@ -8,6 +8,7 @@ import { useAuthStore } from './store/useAuthStore';
 // Pages - to be created
 import Splash from './pages/Splash';
 import Auth from './pages/Auth';
+import ResetPassword from './pages/ResetPassword';
 import Home from './pages/Home';
 import Orders from './pages/Orders';
 import ProfilePage from './pages/Profile';
@@ -17,7 +18,7 @@ import MyReviews from './pages/Profile/Reviews';
 import Security from './pages/Profile/Security';
 import About from './pages/Profile/About';
 import PrivacyPolicy from './pages/Profile/PrivacyPolicy';
-import Wallet from './pages/Profile/Wallet';
+import Transactions from './pages/Profile/Transactions';
 import FoodDetail from './pages/FoodDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -26,6 +27,7 @@ import Notifications from './pages/Notifications';
 
 // Components
 import Layout from './components/Layout';
+import ScrollToTop from './components/ScrollToTop';
 
 import { handleSupabaseError } from './lib/error-handler';
 
@@ -74,21 +76,40 @@ export default function App() {
     try {
       // Initial session check
       supabase.auth.getSession().then(({ data: { session }, error }) => {
+        // Check if we are currently in a password reset flow
+        const isRecovery = window.location.hash.includes('access_token') || 
+                          window.location.search.includes('type=recovery') ||
+                          window.location.pathname === '/reset-password';
+
         if (error) {
           const errMsg = error.message.toLowerCase();
-          if (errMsg.includes('refresh_token_not_found') || 
-              errMsg.includes('refresh token not found') || 
-              errMsg.includes('invalid refresh token') ||
-              errMsg.includes('invalid_grant')) {
-            console.warn('Session expired or invalid, clearing local state...');
-            // Use window.localStorage.clear() as a fallback to ensure everything is wiped
+          const isAuthError = errMsg.includes('refresh_token_not_found') || 
+                             errMsg.includes('refresh token not found') || 
+                             errMsg.includes('invalid refresh token') ||
+                             errMsg.includes('invalid_grant');
+
+          if (isAuthError && !isRecovery) {
+            console.warn('Session expired or invalid, cleaning local state...');
+            
+            // Clear standard and project-specific keys
             window.localStorage.removeItem('supabase.auth.token');
+            window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
+            
             supabase.auth.signOut().finally(() => {
               setAuth(null, null);
-              window.location.href = '/auth';
+              if (window.location.pathname !== '/auth') {
+                window.location.href = '/auth';
+              }
             });
             return;
           }
+          
+          if (isAuthError && isRecovery) {
+            // If it's an auth error but we have recovery tokens, just clear the error and let the SDK handle it
+            console.log('Detected recovery flow with legacy session error, ignoring error to allow recovery');
+            return;
+          }
+          
           throw error;
         }
 
@@ -106,9 +127,20 @@ export default function App() {
         } else if (
           errMsg.includes('refresh_token_not_found') || 
           errMsg.includes('refresh token not found') || 
-          errMsg.includes('invalid refresh token')
+          errMsg.includes('invalid refresh token') ||
+          errMsg.includes('invalid_grant')
         ) {
-          supabase.auth.signOut().finally(() => setAuth(null, null));
+          const isRecovery = window.location.hash.includes('access_token') || 
+                            window.location.search.includes('type=recovery') ||
+                            window.location.pathname === '/reset-password';
+          
+          if (!isRecovery) {
+            window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
+            supabase.auth.signOut().finally(() => {
+              setAuth(null, null);
+              if (window.location.pathname !== '/auth') window.location.href = '/auth';
+            });
+          }
         } else {
           console.error('Session check error:', err);
           setAuth(null, null);
@@ -182,9 +214,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Splash />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/home" element={<Home />} />
@@ -200,7 +234,7 @@ export default function App() {
             <Route path="/profile/reviews" element={<MyReviews />} />
             <Route path="/profile/security" element={<Security />} />
             <Route path="/profile/about" element={<About />} />
-            <Route path="/profile/wallet" element={<Wallet />} />
+            <Route path="/profile/transactions" element={<Transactions />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Route>
           

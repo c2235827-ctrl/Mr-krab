@@ -12,6 +12,7 @@ export default function Auth() {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   const [email, setEmail] = useState('');
@@ -19,8 +20,35 @@ export default function Auth() {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
 
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success('Check your email for the reset link! 📧');
+      setIsForgotPassword(false);
+      setIsLogin(true);
+    } catch (error: any) {
+      handleSupabaseError(error, 'Reset Password');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   async function handleAuth(e: React.FormEvent) {
     e.preventDefault();
+    if (isForgotPassword) {
+      handleResetPassword(e);
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -47,6 +75,7 @@ export default function Auth() {
           password,
           options: {
             data: { full_name: fullName, phone },
+            emailRedirectTo: `${window.location.origin}/auth`,
           },
         });
         if (error) throw error;
@@ -75,16 +104,19 @@ export default function Auth() {
 
       <div className="mb-10">
         <h1 className="text-4xl font-black mb-2 italic">
-          {isLogin ? 'Welcome Back' : 'Join the Family'}
+          {isForgotPassword ? 'Reset Password' : (isLogin ? 'Welcome Back' : 'Join the Family')}
         </h1>
         <p className="text-muted text-lg">
-          {isLogin ? 'Authentic flavour is just a tap away.' : 'Start your food journey with Mr. Krab.'}
+          {isForgotPassword 
+            ? 'Enter your email to receive a password reset link.'
+            : (isLogin ? 'Authentic flavour is just a tap away.' : 'Start your food journey with Mr. Krab.')
+          }
         </p>
       </div>
 
       <form onSubmit={handleAuth} className="flex-1 flex flex-col gap-5">
         <AnimatePresence mode="popLayout" initial={false}>
-          {!isLogin && (
+          {(!isLogin && !isForgotPassword) && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -129,20 +161,26 @@ export default function Auth() {
           />
         </div>
 
-        <div className="relative">
-          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-white border border-gray-100 py-4 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
-          />
-        </div>
+        {!isForgotPassword && (
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
+            <input
+              type="password"
+              placeholder="Password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-white border border-gray-100 py-4 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
+            />
+          </div>
+        )}
 
-        {isLogin && (
-          <button type="button" className="text-sm font-semibold text-accent self-end">
+        {isLogin && !isForgotPassword && (
+          <button 
+            type="button" 
+            onClick={() => setIsForgotPassword(true)}
+            className="text-sm font-semibold text-accent self-end"
+          >
             Forgot Password?
           </button>
         )}
@@ -152,19 +190,31 @@ export default function Auth() {
           disabled={isLoading}
           className="mt-4 w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 transition-all active:opacity-75 disabled:opacity-70 flex items-center justify-center gap-2"
         >
-          {isLoading ? <Loader2 className="animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
+          {isLoading ? <Loader2 className="animate-spin" /> : (isForgotPassword ? 'Send Reset Link' : (isLogin ? 'Sign In' : 'Create Account'))}
         </button>
 
         <div className="mt-8 text-center">
           <p className="text-muted">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="font-bold text-accent"
-            >
-              {isLogin ? 'Sign Up' : 'Sign In'}
-            </button>
+            {isForgotPassword ? (
+              <button
+                type="button"
+                onClick={() => setIsForgotPassword(false)}
+                className="font-bold text-accent"
+              >
+                Back to Sign In
+              </button>
+            ) : (
+              <>
+                {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="font-bold text-accent"
+                >
+                  {isLogin ? 'Sign Up' : 'Sign In'}
+                </button>
+              </>
+            )}
           </p>
         </div>
       </form>

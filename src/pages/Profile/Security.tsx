@@ -45,16 +45,16 @@ export default function Security() {
   };
 
   return (
-    <div className="min-h-screen bg-bg p-6 flex flex-col gap-8">
+    <div className="bg-bg flex flex-col min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
+      <div className="h-24 px-6 flex items-center gap-4 bg-bg sticky top-0 z-20 border-b border-gray-100/50">
+        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm active:scale-95 transition-all">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-2xl font-black italic">Privacy & Security</h1>
       </div>
 
-      <div className="flex flex-col gap-8">
+      <div className="p-6 flex flex-col gap-8">
         {/* Security Settings */}
         <div className="flex flex-col gap-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted ml-2">Security</h3>
