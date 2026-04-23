@@ -28,6 +28,7 @@ import Notifications from './pages/Notifications';
 // Components
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
+import { usePushNotifications } from './hooks/usePushNotifications';
 
 import { handleSupabaseError } from './lib/error-handler';
 
@@ -71,6 +72,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const [configError, setConfigError] = React.useState<string | null>(null);
+
+  usePushNotifications();
 
   useEffect(() => {
     try {
