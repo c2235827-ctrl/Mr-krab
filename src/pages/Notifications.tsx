@@ -32,8 +32,9 @@ export default function Notifications() {
 
     markAllAsRead();
 
+    const channelName = `notifs-page-${user.id}-${Math.random().toString(36).slice(2, 7)}`;
     const channel = supabase
-      .channel('customer-notifications')
+      .channel(channelName)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
@@ -54,7 +55,6 @@ export default function Notifications() {
   const { data: notifications, isLoading } = useQuery<Notification[]>({
     queryKey: ['notifications'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
       const { data, error } = await supabase
@@ -66,16 +66,17 @@ export default function Notifications() {
       if (error) throw error;
       return data || [];
     },
+    enabled: !!user,
   });
 
   // Mark all as read mutation
   const markAsRead = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
       await supabase
         .from('notifications')
         .update({ is_read: true })
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .eq('is_read', false);
     },
     onSuccess: () => {

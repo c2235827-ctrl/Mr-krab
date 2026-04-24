@@ -3,6 +3,7 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Home, Search, ClipboardList, User, ShoppingCart, Bell } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useCartStore, getTotalItems } from '../store/useCartStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
@@ -19,10 +20,11 @@ export default function Layout() {
   const items = useCartStore((state) => state.items);
   const totalItems = getTotalItems(items);
   
+  const user = useAuthStore(state => state.user);
+  
   const { data: unreadCount, refetch: refetchCount } = useQuery({
     queryKey: ['unread-notif-count'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return 0;
       const { count } = await supabase
         .from('notifications')
@@ -31,43 +33,35 @@ export default function Layout() {
         .eq('is_read', false);
       return count ?? 0;
     },
+    enabled: !!user,
   });
 
   useEffect(() => {
+    if (!user) return;
+    
     let channel: any = null;
 
-    const setupListener = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Use a unique channel name to avoid collisions
-      const channelName = `unread-notif-${user.id}-${Math.random().toString(36).slice(2, 7)}`;
-      
-      channel = supabase
-        .channel(channelName)
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`
-        }, () => {
-          refetchCount();
-        })
-        .subscribe((status: string) => {
-          if (status === 'SUBSCRIBED') {
-            console.log('Realtime: Subscribed to unread notification changes');
-          }
-        });
-    };
-
-    setupListener();
+    // Use a unique channel name to avoid collisions
+    const channelName = `unread-notif-layout-${user.id}-${Math.floor(Math.random() * 1000)}`;
+    
+    channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`
+      }, () => {
+        refetchCount();
+      })
+      .subscribe();
 
     return () => {
       if (channel) {
         supabase.removeChannel(channel);
       }
     };
-  }, [refetchCount]);
+  }, [user, refetchCount]);
 
   // Hide bottom nav on specific screens if needed (e.g. food detail)
   const isDetailScreen = location.pathname.startsWith('/item/');
