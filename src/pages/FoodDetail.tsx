@@ -7,14 +7,21 @@ import { formatCurrency } from '../lib/utils';
 import { motion } from 'motion/react';
 import { ArrowLeft, Share2, Star, Clock, Minus, Plus, Loader2 } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { toast } from 'react-hot-toast';
+import { Review } from '../types';
 
 export default function FoodDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
+  const { user, profile } = useAuthStore();
   
   const [quantity, setQuantity] = useState(1);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch Item
   const { data: item, isLoading } = useQuery<MenuItem>({
@@ -30,7 +37,7 @@ export default function FoodDetail() {
     },
   });
 
-  const { data: ratingData } = useQuery({
+  const { data: ratingData, refetch: refetchRating } = useQuery({
     queryKey: ['item-rating', item?.id],
     enabled: !!item?.id,
     queryFn: async () => {
@@ -41,6 +48,20 @@ export default function FoodDetail() {
       if (!data || data.length === 0) return { avg: null, count: 0 };
       const avg = data.reduce((s, r) => s + r.rating, 0) / data.length;
       return { avg: avg.toFixed(1), count: data.length };
+    }
+  });
+
+  const { data: reviews, refetch: refetchReviews } = useQuery<Review[]>({
+    queryKey: ['item-reviews', item?.id],
+    enabled: !!item?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*, user:profiles(*)')
+        .eq('menu_item_id', item!.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
     }
   });
 
@@ -64,6 +85,34 @@ export default function FoodDetail() {
     });
     toast.success('Added to cart!');
     navigate(-1);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!user || !item) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .insert({
+          menu_item_id: item.id,
+          user_id: user.id,
+          rating,
+          comment: comment.trim() || null,
+        });
+
+      if (error) throw error;
+      
+      toast.success('Review submitted!');
+      setShowReviewForm(false);
+      setComment('');
+      setRating(5);
+      refetchRating();
+      refetchReviews();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -173,7 +222,7 @@ export default function FoodDetail() {
 
           {/* Ingredients */}
           {(item.allergens?.length > 0 || item.tags?.length > 0) && (
-            <div className="mb-4">
+            <div className="mb-10">
               <h3 className="text-sm font-black uppercase tracking-[0.1em] text-muted mb-4">Core Ingredients</h3>
               <div className="flex flex-wrap gap-3">
                 {(item.allergens?.length > 0 ? item.allergens : item.tags)?.map((tag, i) => (
@@ -184,6 +233,98 @@ export default function FoodDetail() {
               </div>
             </div>
           )}
+
+          {/* Reviews Section */}
+          <div className="mb-20">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-sm font-black uppercase tracking-[0.1em] text-muted">Customer Reviews</h3>
+              {user && (
+                <button 
+                  onClick={() => setShowReviewForm(!showReviewForm)}
+                  className="text-xs font-black text-accent uppercase tracking-widest border-b-2 border-accent"
+                >
+                  {showReviewForm ? 'Cancel' : 'Write a review'}
+                </button>
+              )}
+            </div>
+
+            {showReviewForm && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-8 overflow-hidden"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button key={s} onClick={() => setRating(s)}>
+                      <Star 
+                        size={24} 
+                        className={s <= rating ? "text-[#FFB800]" : "text-gray-200"} 
+                        fill={s <= rating ? "currentColor" : "none"} 
+                      />
+                    </button>
+                  ))}
+                </div>
+                <textarea 
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Tell us what you think about this dish..."
+                  className="w-full bg-card rounded-2xl p-4 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-accent min-h-[100px] mb-4"
+                />
+                <button 
+                  onClick={handleSubmitReview}
+                  disabled={isSubmitting}
+                  className="w-full btn-primary py-4 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2"
+                >
+                  {isSubmitting && <Loader2 className="animate-spin" size={16} />}
+                  Submit Review
+                </button>
+              </motion.div>
+            )}
+
+            {reviews && reviews.length > 0 ? (
+              <div className="flex flex-col gap-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="flex gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-card shrink-0 overflow-hidden border border-gray-100">
+                      {review.user?.avatar_url ? (
+                        <img src={review.user.avatar_url} alt={review.user.full_name || ''} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center font-black text-muted">
+                          {(review.user?.full_name || 'U').charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-sm">{review.user?.full_name || 'Customer'}</span>
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Star 
+                              key={i} 
+                              size={10} 
+                              className={i < review.rating ? "text-[#FFB800]" : "text-gray-200"} 
+                              fill={i < review.rating ? "currentColor" : "none"} 
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm text-primary/70 leading-relaxed">
+                        {review.comment}
+                      </p>
+                      <span className="text-[10px] text-muted font-bold mt-2">
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-card rounded-3xl opacity-50">
+                <p className="text-xs font-black uppercase tracking-widest">No reviews yet. Be the first!</p>
+              </div>
+            )}
+          </div>
 
         </div>
       </motion.div>

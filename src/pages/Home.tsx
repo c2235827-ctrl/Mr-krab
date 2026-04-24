@@ -43,6 +43,19 @@ export default function Home() {
     },
   });
 
+  const { data: popularItems } = useQuery<MenuItem[]>({
+    queryKey: ['menu-popular'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('menu_items')
+        .select('*')
+        .eq('is_popular', true)
+        .eq('is_available', true)
+        .limit(10);
+      return data || [];
+    },
+  });
+
   const { data: featuredItems } = useQuery<MenuItem[]>({
     queryKey: ['menu-featured'],
     queryFn: async () => {
@@ -189,6 +202,43 @@ export default function Home() {
         </div>
       )}
 
+      {/* Popular Meals - Always Shown */}
+      {popularItems && popularItems.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-black italic">Popular Meals</h2>
+            <Link to="/search" className="text-accent text-[10px] font-black uppercase tracking-widest bg-accent/5 px-4 py-2 rounded-full">
+              See All
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 pb-4">
+            {popularItems.map((item) => (
+              <div key={item.id} className="w-full">
+                <MenuCard 
+                  item={item} 
+                  onAdd={() => {
+                    addItem({ menuItem: item, quantity: 1 });
+                    toast.success(`${item.name} added!`);
+                  }} 
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Featured Items / Chef's Selection - Always Shown */}
+      {featuredItems && featuredItems.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-2xl font-black italic">Chef's Selection</h2>
+          <div className="flex flex-col gap-4 pb-4">
+            {featuredItems.map((item) => (
+              <FeaturedCard key={item.id} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Categories */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -202,11 +252,11 @@ export default function Home() {
               </button>
             )}
         </div>
-        <div className="horizontal-scroll gap-4 pb-2 -mx-6 px-6">
+        <div className="flex flex-wrap gap-2 pb-2">
           <button
             onClick={() => setActiveCategory('all')}
             className={cn(
-              "px-6 py-3 rounded-[20px] text-sm font-bold transition-all whitespace-nowrap border-2",
+              "px-5 py-2.5 rounded-[20px] text-xs font-bold transition-all whitespace-nowrap border-2",
               activeCategory === 'all' ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-gray-100 text-primary hover:border-accent/20"
             )}
           >
@@ -217,7 +267,7 @@ export default function Home() {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={cn(
-                "px-6 py-3 rounded-[20px] text-sm font-bold transition-all whitespace-nowrap border-2",
+                "px-5 py-2.5 rounded-[20px] text-xs font-bold transition-all whitespace-nowrap border-2",
                 activeCategory === cat.id ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-gray-100 text-primary hover:border-accent/20"
               )}
             >
@@ -227,23 +277,11 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Featured Items - Only on 'All' */}
-      {featuredItems && featuredItems.length > 0 && activeCategory === 'all' && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-black italic">Chef's Selection</h2>
-          <div className="horizontal-scroll gap-6 -mx-6 px-6 pb-4">
-            {featuredItems.map((item) => (
-              <FeaturedCard key={item.id} item={item} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Grid of Items */}
+      {/* Dynamic Menu Grid */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-black italic">
-            {activeCategory === 'all' ? 'Popular Menu' : categories?.find(c => c.id === activeCategory)?.name}
+            {activeCategory === 'all' ? 'Our Menu' : categories?.find(c => c.id === activeCategory)?.name}
           </h2>
         </div>
         
@@ -253,9 +291,9 @@ export default function Home() {
             <p className="text-xs font-black uppercase tracking-widest mt-4">Coming Soon to this category</p>
           </div>
         ) : (
-          <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
+          <div className="grid grid-cols-2 gap-4 pb-4">
             {items?.map((item) => (
-              <div key={item.id} className="min-w-[210px] max-w-[210px] snap-center">
+              <div key={item.id} className="w-full">
                 <MenuCard 
                   item={item} 
                   onAdd={() => {
@@ -273,17 +311,16 @@ export default function Home() {
       {discountItems && discountItems.length > 0 && activeCategory === 'all' && (
         <div className="flex flex-col gap-4 mt-4">
           <h2 className="text-2xl font-black italic">Special For You 🦀</h2>
-          <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
+          <div className="flex flex-col gap-4 pb-4">
             {discountItems.map((item) => (
-              <div key={item.id} className="min-w-[260px] snap-center">
-                <DiscountCard 
-                  item={item} 
-                  onAdd={() => {
-                    addItem({ menuItem: item, quantity: 1 });
-                    toast.success(`${item.name} added!`);
-                  }}
-                />
-              </div>
+              <DiscountCard 
+                key={item.id}
+                item={item} 
+                onAdd={() => {
+                  addItem({ menuItem: item, quantity: 1 });
+                  toast.success(`${item.name} added!`);
+                }}
+              />
             ))}
           </div>
         </div>
@@ -293,10 +330,23 @@ export default function Home() {
 }
 
 function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
+  const { data: ratingData } = useQuery({
+    queryKey: ['item-rating', item.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('menu_item_id', item.id);
+      if (!data || data.length === 0) return { avg: null, count: 0 };
+      const avg = data.reduce((s, r) => s + r.rating, 0) / data.length;
+      return { avg: avg.toFixed(1), count: data.length };
+    }
+  });
+
   return (
     <Link 
       to={`/item/${item.slug}`}
-      className="relative min-w-[240px] h-38 bg-white rounded-[32px] p-4 shadow-sm flex items-center gap-4 overflow-hidden snap-center group active:scale-95 transition-transform"
+      className="relative w-full h-38 bg-white rounded-[32px] p-4 shadow-sm flex items-center gap-4 overflow-hidden group active:scale-95 transition-transform"
     >
       {/* Small Image with Badge */}
       <div className="w-20 h-20 rounded-2xl overflow-hidden bg-card shrink-0 relative z-10 shadow-md">
@@ -317,7 +367,7 @@ function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
         <div className="flex items-center gap-2 mb-0.5">
           <div className="flex items-center gap-0.5 text-[#FFB800]">
             <Star size={8} fill="currentColor" />
-            <span className="text-[8px] font-black text-primary">4.8</span>
+            <span className="text-[8px] font-black text-primary">{ratingData?.avg || '5.0'}</span>
           </div>
           <span className="text-[6px] text-muted font-bold uppercase tracking-widest bg-card px-1.5 py-0.5 rounded-full">Chef Choice</span>
         </div>
@@ -338,6 +388,19 @@ function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
 }
 
 function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
+  const { data: ratingData } = useQuery({
+    queryKey: ['item-rating', item.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('menu_item_id', item.id);
+      if (!data || data.length === 0) return { avg: null, count: 0 };
+      const avg = data.reduce((s, r) => s + r.rating, 0) / data.length;
+      return { avg: avg.toFixed(1), count: data.length };
+    }
+  });
+
   return (
     <div className="bg-white rounded-[32px] p-4 shadow-sm flex flex-col gap-4 group relative overflow-hidden active:scale-95 transition-transform">
       <Link to={`/item/${item.slug}`} className="flex flex-col gap-4">
@@ -353,6 +416,10 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
               {Math.round(((item.price - item.discount_price) / item.price) * 100)}% OFF
             </div>
           )}
+          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+            <Star size={10} className="text-[#FFB800]" fill="currentColor" />
+            <span className="text-[10px] font-black text-primary">{ratingData?.avg || '4.9'}</span>
+          </div>
         </div>
         <div className="flex flex-col px-1">
           <h4 className="font-serif font-black text-base italic leading-tight truncate mb-1">{item.name}</h4>

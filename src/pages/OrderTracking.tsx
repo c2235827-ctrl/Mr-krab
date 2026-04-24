@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { Order, OrderStatus } from '../types';
 import { formatCurrency, cn } from '../lib/utils';
 import { motion } from 'motion/react';
-import { ArrowLeft, Clock, MapPin, Package, CheckCircle2, Truck, Flag, Loader2 } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Package, CheckCircle2, Truck, Flag, Loader2, Star } from 'lucide-react';
 
 const steps: { status: OrderStatus; label: string; icon: any; description: string }[] = [
   { status: 'pending', label: 'Order Placed', icon: ClipboardList, description: 'We have received your order' },
@@ -221,21 +221,33 @@ export default function OrderTracking() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-4 mb-10">
-         <a 
-           href="mailto:mrkrab@ozsaip.com"
-           className="flex-1 btn-primary py-4 flex items-center justify-center p-0"
-         >
-           Contact Support
-         </a>
+      <div className="flex flex-col gap-4 mb-20">
          {order.status === 'delivered' && (
            <button 
-             onClick={() => navigate('/orders')}
-             className="flex-1 bg-accent text-white py-4 rounded-xl font-bold"
+             onClick={() => navigate('/home')} // Or better, scroll him to the items list below to click one
+             className="w-full bg-[#FFB800] text-white py-5 rounded-2xl font-black italic text-lg shadow-xl shadow-[#FFB800]/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
            >
-             View All Orders
+             <Star size={20} fill="currentColor" />
+             Rate the Food
            </button>
          )}
+         
+         <div className="flex gap-4">
+           <a 
+             href="mailto:mrkrab@ozsaip.com"
+             className="flex-1 border-2 border-primary text-primary py-4 rounded-xl flex items-center justify-center font-bold text-sm"
+           >
+             Contact Support
+           </a>
+           {order.status === 'delivered' && (
+             <button 
+               onClick={() => navigate('/orders')}
+               className="flex-1 bg-primary text-white py-4 rounded-xl font-bold text-sm"
+             >
+               View History
+             </button>
+           )}
+         </div>
       </div>
     </div>
   );

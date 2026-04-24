@@ -101,6 +101,16 @@ export type Notification = {
   created_at: string;
 };
 
+export type Review = {
+  id: string;
+  menu_item_id: string;
+  user_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  user?: Profile;
+};
+
 export type Promotion = {
   id: string;
   code: string;
