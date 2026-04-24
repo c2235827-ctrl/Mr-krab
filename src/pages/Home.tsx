@@ -255,7 +255,7 @@ export default function Home() {
         ) : (
           <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
             {items?.map((item) => (
-              <div key={item.id} className="min-w-[150px] max-w-[150px] snap-center">
+              <div key={item.id} className="min-w-[210px] max-w-[210px] snap-center">
                 <MenuCard 
                   item={item} 
                   onAdd={() => {
@@ -339,9 +339,9 @@ function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
 
 function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
   return (
-    <div className="bg-white rounded-[24px] p-2.5 shadow-sm flex flex-col gap-2.5 group relative overflow-hidden active:scale-95 transition-transform">
-      <Link to={`/item/${item.slug}`} className="flex flex-col gap-2.5">
-        <div className="aspect-square rounded-[20px] overflow-hidden bg-card relative">
+    <div className="bg-white rounded-[32px] p-4 shadow-sm flex flex-col gap-4 group relative overflow-hidden active:scale-95 transition-transform">
+      <Link to={`/item/${item.slug}`} className="flex flex-col gap-4">
+        <div className="aspect-square rounded-[28px] overflow-hidden bg-card relative">
           <img 
             src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
             alt={item.name} 
@@ -349,20 +349,20 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
             referrerPolicy="no-referrer"
           />
           {item.discount_price && (
-            <div className="absolute top-2 left-2 bg-accent text-white px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter shadow-lg shadow-accent/20">
+            <div className="absolute top-3 left-3 bg-accent text-white px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter shadow-lg shadow-accent/20">
               {Math.round(((item.price - item.discount_price) / item.price) * 100)}% OFF
             </div>
           )}
         </div>
         <div className="flex flex-col px-1">
-          <h4 className="font-serif font-black text-xs italic leading-tight truncate mb-0.5">{item.name}</h4>
+          <h4 className="font-serif font-black text-base italic leading-tight truncate mb-1">{item.name}</h4>
           <div className="flex items-center justify-between">
-            <span className="text-accent text-xs font-black">{formatCurrency(item.discount_price || item.price)}</span>
+            <span className="text-accent text-base font-black">{formatCurrency(item.discount_price || item.price)}</span>
             <button 
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-              className="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+              className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-transform"
             >
-              <Plus size={14} />
+              <Plus size={20} />
             </button>
           </div>
         </div>

@@ -76,6 +76,18 @@ export default function App() {
 
   useEffect(() => {
     try {
+      const clearSupabaseSession = () => {
+        console.warn('Aggressively cleaning local auth state due to invalid session/token...');
+        const keysToRemove = [];
+        for (let i = 0; i < window.localStorage.length; i++) {
+          const key = window.localStorage.key(i);
+          if (key && (key.includes('supabase') || key.startsWith('sb-'))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(k => window.localStorage.removeItem(k));
+      };
+
       // Initial session check
       supabase.auth.getSession().then(({ data: { session }, error }) => {
         if (error) {
@@ -89,12 +101,7 @@ export default function App() {
                              (errMsg.includes('refresh') && errMsg.includes('token'));
 
           if (isAuthError) {
-            console.warn('Session expired or invalid, cleaning local state...');
-            
-            // Clear standard and project-specific keys
-            window.localStorage.removeItem('supabase.auth.token');
-            window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
-            
+            clearSupabaseSession();
             supabase.auth.signOut().finally(() => {
               setAuth(null, null);
               if (window.location.pathname !== '/auth') {
@@ -127,7 +134,7 @@ export default function App() {
           errMsg.includes('token_not_found') ||
           (errMsg.includes('refresh') && errMsg.includes('token'))
         ) {
-          window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
+          clearSupabaseSession();
           supabase.auth.signOut().finally(() => {
             setAuth(null, null);
             if (window.location.pathname !== '/auth') window.location.href = '/auth';
