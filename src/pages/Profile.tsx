@@ -14,14 +14,18 @@ import {
   PlusCircle, 
   UserCircle,
   Smartphone,
-  Info
+  Info,
+  Download,
+  BellRing
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { motion } from 'motion/react';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 
 export default function Profile() {
   const { profile, user, setAuth, signOut } = useAuthStore();
   const navigate = useNavigate();
+  const { isInstallable, install } = usePWAInstall();
 
   const { data: orderCount } = useQuery({
     queryKey: ['my-order-count'],
@@ -35,6 +39,37 @@ export default function Profile() {
     await signOut();
     toast.success('Logged out successfully');
     navigate('/auth');
+  };
+
+  const handleTestNotification = async () => {
+    if (Notification.permission !== 'granted') {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        toast.error('Notification permission denied');
+        return;
+      }
+    }
+
+    try {
+      // Local notification to test if it works in foreground
+      new Notification('Mr. Krab 🦀', {
+        body: 'This is a test alert! If you see this, your notifications are working.',
+        icon: '/icon.svg',
+        badge: '/icon.svg',
+        silent: false,
+      } as any);
+      toast.success('Test alert sent!');
+    } catch (err) {
+      console.error('Test notification failed:', err);
+      toast.error('Failed to trigger alert');
+    }
+  };
+
+  const handleInstall = async () => {
+    const success = await install();
+    if (success) {
+      toast.success('App installed successfully!');
+    }
   };
 
   const toggleBiometric = async () => {
@@ -72,6 +107,7 @@ export default function Profile() {
       title: 'Preferences',
       items: [
         { icon: Bell, label: 'Notifications', path: '/notifications' },
+        { icon: BellRing, label: 'Test Alert Flow', path: '#', onClick: handleTestNotification, color: 'text-accent bg-accent/10' },
         { icon: Smartphone, label: 'Biometric Login', path: '#', toggle: true, checked: profile?.biometric_enabled },
         { icon: Shield, label: 'Privacy & Security', path: '/profile/security' },
       ]
@@ -80,6 +116,7 @@ export default function Profile() {
       title: 'Support',
       items: [
         { icon: Info, label: 'About Mr. Krab', path: '/profile/about' },
+        ...(isInstallable ? [{ icon: Download, label: 'Install App (PWA)', path: '#', onClick: handleInstall, color: 'text-green-500 bg-green-50' }] : []),
       ]
     }
   ];
@@ -124,6 +161,10 @@ export default function Profile() {
                   onClick={() => {
                     if (item.toggle) {
                       toggleBiometric();
+                      return;
+                    }
+                    if (item.onClick) {
+                      item.onClick();
                       return;
                     }
                     if (item.path !== '#') {

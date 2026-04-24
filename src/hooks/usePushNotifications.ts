@@ -23,28 +23,48 @@ export function usePushNotifications() {
       }
 
       onMessage(messaging, (payload) => {
+        console.log('[Push] Foreground message received:', payload);
         const title = payload.notification?.title || 'Mr. Krab 🦀';
         const body = payload.notification?.body || 'You have a new notification';
 
-        // Use the real Notification API so the OS shows a popup with sound
+        // Check if we should show a manual notification
+        // Note: Browsers usually DON'T show a notification for foreground messages automatically
         if (Notification.permission === 'granted') {
-          const notification = new Notification(title, {
-            body,
-            icon: '/icon.svg',
-            badge: '/icon.svg',
-            vibrate: [200, 100, 200],
-            silent: false, // let the OS play its default notification sound
-          } as any);
+          try {
+            const notification = new Notification(title, {
+              body,
+              icon: '/icon.svg',
+              badge: '/icon.svg',
+              vibrate: [200, 100, 200],
+              silent: false,
+            } as any);
 
-          // Clicking the notification focuses the app
-          notification.onclick = () => {
-            window.focus();
-            notification.close();
-          };
+            notification.onclick = () => {
+              window.focus();
+              notification.close();
+            };
+          } catch (e) {
+            // Some mobile browsers don't support "new Notification" constructor in foreground
+            // They expect you to use serviceWorkerRegistration.showNotification
+            navigator.serviceWorker.ready.then(registration => {
+              registration.showNotification(title, {
+                body,
+                icon: '/icon.svg',
+                badge: '/icon.svg',
+              } as NotificationOptions);
+            });
+          }
         }
 
-        // Also show the toast as a backup
-        toast(body, { icon: '🔔', duration: 5000 });
+        // Also show the toast as a backup and immediate feedback
+        toast(body, { 
+          icon: '🔔', 
+          duration: 6000,
+          style: {
+            border: '1px solid #accent',
+            padding: '16px',
+          }
+        });
       });
     }
 

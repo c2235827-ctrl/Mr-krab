@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Home, Search, ClipboardList, User, ShoppingCart, Bell } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -18,7 +19,7 @@ export default function Layout() {
   const items = useCartStore((state) => state.items);
   const totalItems = getTotalItems(items);
   
-  const { data: unreadCount } = useQuery({
+  const { data: unreadCount, refetch: refetchCount } = useQuery({
     queryKey: ['unread-notif-count'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -30,8 +31,43 @@ export default function Layout() {
         .eq('is_read', false);
       return count ?? 0;
     },
-    refetchInterval: 30000,
   });
+
+  useEffect(() => {
+    let channel: any = null;
+
+    const setupListener = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Use a unique channel name to avoid collisions
+      const channelName = `unread-notif-${user.id}-${Math.random().toString(36).slice(2, 7)}`;
+      
+      channel = supabase
+        .channel(channelName)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        }, () => {
+          refetchCount();
+        })
+        .subscribe((status: string) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('Realtime: Subscribed to unread notification changes');
+          }
+        });
+    };
+
+    setupListener();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [refetchCount]);
 
   // Hide bottom nav on specific screens if needed (e.g. food detail)
   const isDetailScreen = location.pathname.startsWith('/item/');

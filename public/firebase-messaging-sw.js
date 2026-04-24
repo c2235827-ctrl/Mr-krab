@@ -13,12 +13,40 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  
+  const notificationTitle = payload.notification?.title || 'Mr. Krab 🦀';
+  const notificationOptions = {
+    body: payload.notification?.body || 'You have a new alert',
     icon: '/icon.svg',
     badge: '/icon.svg',
     vibrate: [200, 100, 200],
-    requireInteraction: true, // stays on screen until user taps it
+    requireInteraction: true,
     silent: false,
-  });
+    data: {
+      url: '/notifications'
+    }
+  };
+
+  return self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  const urlToOpen = event.notification.data?.url || '/';
+  
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        if (client.url.includes(urlToOpen) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(urlToOpen);
+      }
+    })
+  );
 });
