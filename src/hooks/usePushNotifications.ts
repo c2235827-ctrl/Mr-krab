@@ -94,7 +94,6 @@ export function usePushNotifications() {
               user_id: user.id, 
               token, 
               platform: 'web',
-              updated_at: new Date().toISOString()
             }, { onConflict: 'token' });
           
           if (error) console.error('[Push] Failed to save push token to Supabase:', error);
@@ -131,17 +130,6 @@ export function usePushNotifications() {
           toast(body, { icon: '🔔', duration: 6000 });
         })
         // Listener for global promotions
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'promotions',
-        }, (payload) => {
-          console.log('[Push] New promotion (Supabase) inserted:', payload.new);
-          const title = 'New Special Offer! 🦀';
-          const body = payload.new.title || 'Check out our latest deal';
-          showNativeNotification(title, body, { id: `promo-${payload.new.id}`, url: '/home' });
-          toast(body, { icon: '🏷️', duration: 8000 });
-        })
         .subscribe((status: string) => {
           console.log(`[Push] Unified channel status:`, status);
         });

@@ -31,25 +31,6 @@ export default function Notifications() {
     };
 
     markAllAsRead();
-
-    const channelName = `notifs-page-${user.id}-${Math.random().toString(36).slice(2, 7)}`;
-    const channel = supabase
-      .channel(channelName)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`,
-      }, () => {
-        // Only invalidate, don't show toast (handled globally)
-        queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        queryClient.invalidateQueries({ queryKey: ['unread-notif-count'] });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [user, queryClient]);
 
   const { data: notifications, isLoading } = useQuery<Notification[]>({
