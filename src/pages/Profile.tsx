@@ -13,7 +13,6 @@ import {
   History,
   PlusCircle, 
   UserCircle,
-  Smartphone,
   Info,
   Download,
   Mail
@@ -48,23 +47,6 @@ export default function Profile() {
     }
   };
 
-  const toggleBiometric = async () => {
-    if (!profile?.id) return;
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ biometric_enabled: !profile?.biometric_enabled })
-        .eq('id', profile.id)
-        .select()
-        .single();
-      if (error) throw error;
-      setAuth(user, data); // update state
-      toast.success(`Biometric login ${data.biometric_enabled ? 'enabled' : 'disabled'}`);
-    } catch (err: any) {
-      toast.error(err.message);
-    }
-  };
-
   const sections = [
     {
       title: 'Finance',
@@ -83,7 +65,6 @@ export default function Profile() {
       title: 'Preferences',
       items: [
         { icon: Bell, label: 'Notifications', path: '/notifications' },
-        { icon: Smartphone, label: 'Biometric Login', path: '#', toggle: true, checked: profile?.biometric_enabled },
         { icon: Shield, label: 'Privacy & Security', path: '/profile/security' },
       ]
     },
@@ -135,10 +116,6 @@ export default function Profile() {
                 <button
                   key={item.label}
                   onClick={() => {
-                    if (item.toggle) {
-                      toggleBiometric();
-                      return;
-                    }
                     if (item.onClick) {
                       item.onClick();
                       return;
@@ -162,14 +139,7 @@ export default function Profile() {
                      <span className="font-bold text-sm text-primary">{item.label}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    {item.value && <span className="font-black text-accent text-sm">{item.value}</span>}
-                    {item.toggle ? (
-                      <div className={cn("w-10 h-6 rounded-full p-1 transition-colors", item.checked ? "bg-accent" : "bg-gray-200")}>
-                        <div className={cn("w-4 h-4 bg-white rounded-full transition-transform", item.checked && "translate-x-4")} />
-                      </div>
-                    ) : (
-                      <ChevronRight size={18} className="text-muted" />
-                    )}
+                    <ChevronRight size={18} className="text-muted" />
                   </div>
                 </button>
               ))}

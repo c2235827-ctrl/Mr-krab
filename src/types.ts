@@ -4,7 +4,6 @@ export type Profile = {
   avatar_url: string | null;
   role: 'customer' | 'admin' | 'kitchen_staff' | 'delivery_rider';
   is_active: boolean;
-  biometric_enabled: boolean;
   marketing_alerts: boolean;
 };
 

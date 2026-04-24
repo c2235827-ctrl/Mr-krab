@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Lock, Loader2, Eye, EyeOff, Shield, Smartphone, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Lock, Loader2, Eye, EyeOff, Shield, ChevronRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { cn } from '../../lib/utils';
 
@@ -19,23 +19,6 @@ export default function Security() {
   // Visibility toggles
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
-
-  const toggleBiometric = async () => {
-    if (!user) return;
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ biometric_enabled: !profile?.biometric_enabled })
-        .eq('id', user.id)
-        .select()
-        .single();
-      if (error) throw error;
-      setAuth(user, data);
-      toast.success(`Biometric login ${data.biometric_enabled ? 'enabled' : 'disabled'}`);
-    } catch (err: any) {
-      toast.error(err.message);
-    }
-  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,30 +160,6 @@ export default function Security() {
         <div className="flex flex-col gap-6">
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted ml-2">Other Preferences</h3>
           <div className="bg-white rounded-[32px] overflow-hidden shadow-sm">
-            <div className="w-full flex items-center justify-between p-6 border-b border-gray-50 last:border-0">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center">
-                  <Smartphone size={20} />
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <span className="font-bold text-sm">Biometric Login</span>
-                  <span className="text-[10px] text-muted font-bold uppercase tracking-widest">FaceID or Fingerprint</span>
-                </div>
-              </div>
-              <button 
-                onClick={toggleBiometric}
-                className={cn(
-                  "w-12 h-7 rounded-full p-1 transition-colors duration-200",
-                  profile?.biometric_enabled ? "bg-accent" : "bg-gray-200"
-                )}
-              >
-                <div className={cn(
-                  "w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200",
-                  profile?.biometric_enabled && "translate-x-5"
-                )} />
-              </button>
-            </div>
-
             <button 
               onClick={() => navigate('/privacy-policy')}
               className="w-full flex items-center justify-between p-6 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors text-left"
