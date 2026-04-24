@@ -69,9 +69,9 @@ export default function FoodDetail() {
   return (
     <div className="min-h-screen bg-bg pb-44">
       {/* Top Bar Overlay */}
-      <div className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center max-w-md mx-auto">
+      <div className="fixed top-0 left-0 right-0 z-[110] p-6 flex justify-between items-center max-w-md mx-auto">
         <button 
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/home')}
           className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center active:opacity-80 transition-opacity"
         >
           <ArrowLeft size={24} />
@@ -196,30 +196,30 @@ export default function FoodDetail() {
       </motion.div>
 
       {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 px-6 py-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50">
+      <div className="fixed bottom-0 left-0 right-0 px-6 py-6 bg-white border-t border-gray-100 z-[100] shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
         <div className="max-w-md mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 bg-card px-2 py-1 rounded-2xl">
+          <div className="flex items-center gap-3 bg-card px-3 py-1.5 rounded-2xl border border-gray-100">
             <button 
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-10 h-10 flex items-center justify-center text-primary active:opacity-60"
+              className="w-10 h-10 flex items-center justify-center text-primary active:opacity-60 transition-opacity"
             >
-              <Minus size={18} />
+              <Minus size={20} />
             </button>
-            <span className="text-lg font-black w-6 text-center">{quantity}</span>
+            <span className="text-xl font-black w-8 text-center">{quantity}</span>
             <button 
               onClick={() => setQuantity(quantity + 1)}
-              className="w-10 h-10 flex items-center justify-center text-accent active:opacity-60"
+              className="w-10 h-10 flex items-center justify-center text-accent active:opacity-60 transition-opacity"
             >
-              <Plus size={18} />
+              <Plus size={20} />
             </button>
           </div>
           
           <button 
             onClick={handleAddToCart}
-            className="flex-1 btn-primary h-[56px] flex items-center justify-between px-6"
+            className="flex-1 btn-primary h-[64px] flex items-center justify-between px-6 shadow-xl shadow-primary/10"
           >
-            <span className="font-black italic">Add to Cart</span>
-            <span className="text-sm font-bold opacity-60">{formatCurrency(total)}</span>
+            <span className="font-black italic text-lg">Add to Cart</span>
+            <span className="text-base font-bold opacity-70">{formatCurrency(total)}</span>
           </button>
         </div>
       </div>

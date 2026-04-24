@@ -61,39 +61,39 @@ export default function Orders() {
           <button onClick={() => navigate('/home')} className="btn-primary px-10">Start Ordering</button>
         </div>
       ) : (
-        <div className="flex flex-col gap-4 mb-20">
+        <div className="flex flex-col gap-3 mb-20">
           {orders?.map((order) => (
             <button
               key={order.id}
               onClick={() => navigate(`/tracking/${order.id}`)}
-              className="bg-white p-6 rounded-[32px] shadow-sm flex flex-col gap-4 text-left group transition-all hover:bg-white"
+              className="bg-white p-5 rounded-[24px] shadow-sm flex flex-col gap-3 text-left group transition-all"
             >
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-muted">Order ID</span>
-                  <span className="font-bold text-sm tracking-tighter">{order.order_number}</span>
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-muted">Order ID</span>
+                  <span className="font-bold text-xs tracking-tighter">{order.order_number}</span>
                 </div>
-                <div className={cn("px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1.5", getStatusStyle(order.status))}>
+                <div className={cn("px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase flex items-center gap-1", getStatusStyle(order.status))}>
                   {getStatusIcon(order.status)}
                   {order.status.replace(/_/g, ' ')}
                 </div>
               </div>
 
-              <div className="h-px bg-gray-50" />
+              <div className="h-px bg-gray-50/50" />
 
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-muted">Placed On</span>
-                  <span className="text-sm font-bold text-primary">{format(new Date(order.created_at), 'MMM d, p')}</span>
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-muted">Placed On</span>
+                  <span className="text-xs font-bold text-primary">{format(new Date(order.created_at), 'MMM d, p')}</span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-muted">Total Paid</span>
-                  <span className="text-sm font-black text-accent">{formatCurrency(order.total)}</span>
+                  <span className="text-[9px] uppercase font-bold tracking-widest text-muted">Total Paid</span>
+                  <span className="text-xs font-black text-accent">{formatCurrency(order.total)}</span>
                 </div>
               </div>
 
-              <div className="mt-2 flex items-center justify-center text-[10px] font-bold text-muted uppercase tracking-widest gap-2 bg-card py-2 rounded-xl group-hover:bg-primary group-hover:text-white transition-colors">
-                View Tracking Details <ChevronRight size={12} />
+              <div className="mt-1 flex items-center justify-center text-[9px] font-bold text-muted uppercase tracking-widest gap-2 bg-card py-2 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+                View Tracking Details <ChevronRight size={10} />
               </div>
             </button>
           ))}

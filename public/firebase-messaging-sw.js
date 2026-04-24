@@ -17,5 +17,8 @@ messaging.onBackgroundMessage((payload) => {
     body: payload.notification.body,
     icon: '/icon.svg',
     badge: '/icon.svg',
+    vibrate: [200, 100, 200],
+    requireInteraction: true, // stays on screen until user taps it
+    silent: false,
   });
 });

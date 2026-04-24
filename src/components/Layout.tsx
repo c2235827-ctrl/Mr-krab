@@ -72,7 +72,7 @@ export default function Layout() {
       )}
 
       {/* Bottom Navigation */}
-      {!isCartScreen && (
+      {!isCartScreen && !isDetailScreen && (
         <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-100 px-6 py-3 z-50">
           <div className="max-w-md mx-auto flex justify-between items-center">
             {navItems.map(({ icon: Icon, label, path }) => {

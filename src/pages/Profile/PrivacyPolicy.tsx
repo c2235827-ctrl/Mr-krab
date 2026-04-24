@@ -91,7 +91,7 @@ export default function PrivacyPolicy() {
     <div className="min-h-screen bg-bg flex flex-col mb-20">
       {/* Header */}
       <div className="p-6 flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
+        <button onClick={() => navigate('/profile/security')} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />
         </button>
         <div>

@@ -119,7 +119,7 @@ export default function Cart() {
     <div className="min-h-screen bg-bg pb-40 px-6 pt-6 flex flex-col gap-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
+        <button onClick={() => navigate('/home')} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-2xl font-black italic">Your Cart</h1>

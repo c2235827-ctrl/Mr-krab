@@ -41,7 +41,7 @@ export default function Transactions() {
     <div className="bg-bg flex flex-col pb-20">
       {/* Header */}
       <div className="h-24 px-6 flex items-center gap-4 bg-bg sticky top-0 z-20 border-b border-gray-100/50">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm active:scale-95 transition-all">
+        <button onClick={() => navigate('/profile')} className="p-3 bg-white rounded-2xl shadow-sm active:scale-95 transition-all">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-2xl font-black italic">Transaction History</h1>

@@ -20,7 +20,7 @@ export default function About() {
     <div className="min-h-screen bg-bg p-6 flex flex-col gap-10 mb-20">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
+        <button onClick={() => navigate('/profile')} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-2xl font-black italic">About Mr. Krab</h1>

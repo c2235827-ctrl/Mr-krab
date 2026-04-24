@@ -12,6 +12,7 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        injectRegister: false,
         manifest: {
           name: 'Mr. Krab',
           short_name: 'MrKrab',

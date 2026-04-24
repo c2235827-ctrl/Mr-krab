@@ -126,7 +126,7 @@ export default function App() {
         if (errMsg.includes('supabase configuration missing')) {
           setConfigError(err.message);
         } else if (errMsg.includes('failed to fetch')) {
-          setConfigError('Could not connect to the server. Please check your internet connection.');
+          setConfigError('Could not connect to the database. This is usually due to a missing/invalid Supabase URL or a blocked network connection (VPN/Ad-blocker).');
         } else if (
           errMsg.includes('refresh_token_not_found') || 
           errMsg.includes('refresh token not found') || 

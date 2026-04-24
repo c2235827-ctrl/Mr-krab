@@ -90,26 +90,26 @@ export default function OrderTracking() {
       </div>
 
       {/* Summary Card */}
-      <div className="bg-primary text-white p-8 rounded-[40px] shadow-2xl relative overflow-hidden">
+      <div className="bg-primary text-white p-6 rounded-[32px] shadow-xl relative overflow-hidden">
          <div className="relative z-10">
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-4">
                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase font-bold tracking-widest opacity-60">Order Number</span>
-                  <span className="text-xl font-black">{order.order_number}</span>
+                  <span className="text-[9px] uppercase font-bold tracking-widest opacity-60">Order Number</span>
+                  <span className="text-lg font-black">{order.order_number}</span>
                </div>
-               <div className="bg-white/10 px-4 py-2 rounded-2xl flex items-center gap-2">
-                  <Clock size={16} className="text-accent" />
-                  <span className="font-bold text-sm">~{order.delivery_type === 'delivery' ? '35' : '15'} mins</span>
+               <div className="bg-white/10 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                  <Clock size={14} className="text-accent" />
+                  <span className="font-bold text-xs">~{order.delivery_type === 'delivery' ? '35' : '15'} mins</span>
                </div>
             </div>
             
-            <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl">
-               <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary">
-                  <MapPin size={24} />
+            <div className="flex items-center gap-4 bg-white/5 p-3 rounded-2xl">
+               <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary">
+                  <MapPin size={20} />
                </div>
                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold tracking-widest opacity-60">Delivery Address</span>
-                  <span className="text-sm font-bold line-clamp-1">
+                  <span className="text-[9px] uppercase font-bold tracking-widest opacity-60">Delivery Address</span>
+                  <span className="text-xs font-bold line-clamp-1">
                      {formatDeliveryAddress(order.delivery_address)}
                   </span>
                </div>
@@ -118,7 +118,7 @@ export default function OrderTracking() {
       </div>
 
       {/* Tracking Stepper */}
-      <div className="bg-white p-8 rounded-[40px] shadow-sm flex flex-col gap-8">
+      <div className="bg-white p-6 rounded-[32px] shadow-sm flex flex-col gap-6">
          {steps.map((step, index) => {
            const isCompleted = index < currentStepIndex;
            const isCurrent = index === currentStepIndex;
@@ -178,22 +178,22 @@ export default function OrderTracking() {
       </div>
 
       {/* Transaction Details (Items) */}
-      <div className="bg-white p-8 rounded-[40px] shadow-sm flex flex-col gap-6">
+      <div className="bg-white p-6 rounded-[32px] shadow-sm flex flex-col gap-5">
          <div className="flex items-center justify-between">
-           <h3 className="text-xl font-black italic">Order Summary</h3>
-           <span className="text-accent font-black">{formatCurrency(order.total)}</span>
+           <h3 className="text-lg font-black italic">Order Summary</h3>
+           <span className="text-accent font-black text-sm">{formatCurrency(order.total)}</span>
          </div>
          
-         <div className="flex flex-col gap-4">
+         <div className="flex flex-col gap-3">
             {order.order_items?.map((item) => (
-              <div key={item.id} className="flex justify-between items-center bg-card p-4 rounded-2xl">
+              <div key={item.id} className="flex justify-between items-center bg-card p-3 rounded-xl">
                 <div className="flex items-center gap-3">
-                   <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black">
+                   <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-[9px] font-black">
                      {item.quantity}x
                    </div>
-                   <span className="font-bold text-sm line-clamp-1">{item.menu_item?.name}</span>
+                   <span className="font-bold text-xs line-clamp-1">{item.menu_item?.name}</span>
                 </div>
-                <span className="font-bold text-xs text-muted">{formatCurrency(item.total_price)}</span>
+                <span className="font-bold text-[10px] text-muted">{formatCurrency(item.total_price)}</span>
               </div>
             ))}
          </div>

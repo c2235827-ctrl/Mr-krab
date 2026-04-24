@@ -47,7 +47,7 @@ export default function PersonalInfo() {
     <div className="bg-bg flex flex-col">
       {/* Header */}
       <div className="h-24 px-6 flex items-center gap-4 bg-bg sticky top-0 z-20 border-b border-gray-100/50">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm active:scale-95 transition-all">
+        <button onClick={() => navigate('/profile')} className="p-3 bg-white rounded-2xl shadow-sm active:scale-95 transition-all">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-2xl font-black italic">Personal Profile</h1>
@@ -134,7 +134,7 @@ export default function PersonalInfo() {
           </button>
           <button 
             type="button" 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/profile')}
             className="w-full py-4 text-sm font-black text-muted uppercase tracking-widest hover:text-primary transition-colors"
           >
             Cancel Changes

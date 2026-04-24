@@ -136,33 +136,33 @@ export default function Home() {
             {activePromos.map((promo) => (
               <div 
                 key={promo.id}
-                className="relative min-w-[320px] max-w-[320px] h-60 rounded-[40px] overflow-hidden bg-primary shadow-2xl flex items-center p-8 group transition-all"
+                className="relative min-w-[280px] max-w-[280px] h-48 rounded-[32px] overflow-hidden bg-primary shadow-xl flex items-center p-6 group transition-all"
               >
-                <div className="relative z-20 flex flex-col gap-2 w-full">
+                <div className="relative z-20 flex flex-col gap-1 w-full">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Special Offer</span>
-                    <div className="h-[1px] w-8 bg-accent/30" />
+                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-accent">Special Offer</span>
+                    <div className="h-[1px] w-6 bg-accent/30" />
                   </div>
                   
                   <div className="flex flex-col gap-0 mb-1">
-                    <span className="text-4xl font-serif font-black text-white italic leading-none">
+                    <span className="text-3xl font-serif font-black text-white italic leading-none">
                       {promo.discount_type === 'percentage' ? `${Number(promo.discount_value)}%` : formatCurrency(Number(promo.discount_value))}
                     </span>
-                    <span className="text-sm font-serif font-black text-accent italic">OFF YOUR ORDER</span>
+                    <span className="text-[10px] font-serif font-black text-accent italic">OFF YOUR ORDER</span>
                   </div>
 
-                  <h2 className="text-xs font-bold text-white/90 leading-tight line-clamp-2">
+                  <h2 className="text-[10px] font-bold text-white/90 leading-tight line-clamp-2">
                     {promo.title}
                   </h2>
                   
-                  <div className="flex items-center gap-2 mt-3">
-                    <div className="px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/10">
-                       <p className="text-white text-[9px] font-black uppercase tracking-widest">
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="px-2 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/10">
+                       <p className="text-white text-[8px] font-black uppercase tracking-widest">
                          CODE: <span className="text-accent">{promo.code}</span>
                        </p>
                     </div>
                     <button 
-                      className="bg-accent text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase shadow-lg shadow-accent/20 active:scale-95 transition-transform"
+                      className="bg-accent text-white px-3 py-1.5 rounded-lg font-black text-[8px] uppercase shadow-lg shadow-accent/20 active:scale-95 transition-transform"
                     >
                       Use
                     </button>
@@ -255,7 +255,7 @@ export default function Home() {
         ) : (
           <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
             {items?.map((item) => (
-              <div key={item.id} className="min-w-[170px] max-w-[170px] snap-center">
+              <div key={item.id} className="min-w-[150px] max-w-[150px] snap-center">
                 <MenuCard 
                   item={item} 
                   onAdd={() => {
@@ -275,7 +275,7 @@ export default function Home() {
           <h2 className="text-2xl font-black italic">Special For You 🦀</h2>
           <div className="horizontal-scroll gap-4 -mx-6 px-6 pb-4">
             {discountItems.map((item) => (
-              <div key={item.id} className="min-w-[280px] snap-center">
+              <div key={item.id} className="min-w-[260px] snap-center">
                 <DiscountCard 
                   item={item} 
                   onAdd={() => {
@@ -296,10 +296,10 @@ function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
   return (
     <Link 
       to={`/item/${item.slug}`}
-      className="relative min-w-[280px] h-44 bg-white rounded-[40px] p-5 shadow-sm flex items-center gap-5 overflow-hidden snap-center group active:scale-95 transition-transform"
+      className="relative min-w-[240px] h-38 bg-white rounded-[32px] p-4 shadow-sm flex items-center gap-4 overflow-hidden snap-center group active:scale-95 transition-transform"
     >
-      {/* Large Image with Badge */}
-      <div className="w-24 h-24 rounded-3xl overflow-hidden bg-card shrink-0 relative z-10 shadow-lg">
+      {/* Small Image with Badge */}
+      <div className="w-20 h-20 rounded-2xl overflow-hidden bg-card shrink-0 relative z-10 shadow-md">
         <img 
           src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
@@ -307,44 +307,41 @@ function FeaturedCard({ item }: { item: MenuItem; key?: string }) {
           referrerPolicy="no-referrer"
         />
         {item.discount_price && (
-          <div className="absolute top-1 right-1 bg-accent text-white w-8 h-8 rounded-full flex items-center justify-center text-[8px] font-black italic shadow-lg">
+          <div className="absolute top-1 right-1 bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-[6px] font-black italic shadow-lg">
             -{Math.round(((item.price - item.discount_price) / item.price) * 100)}%
           </div>
         )}
       </div>
 
       <div className="flex-1 flex flex-col justify-center min-w-0 relative z-10">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-0.5">
           <div className="flex items-center gap-0.5 text-[#FFB800]">
-            <Star size={10} fill="currentColor" />
-            <span className="text-[10px] font-black text-primary">4.8</span>
+            <Star size={8} fill="currentColor" />
+            <span className="text-[8px] font-black text-primary">4.8</span>
           </div>
-          <span className="text-[8px] text-muted font-bold uppercase tracking-widest bg-card px-2 py-0.5 rounded-full">Chef Choice</span>
+          <span className="text-[6px] text-muted font-bold uppercase tracking-widest bg-card px-1.5 py-0.5 rounded-full">Chef Choice</span>
         </div>
         
-        <h3 className="font-serif text-lg font-black italic leading-tight line-clamp-2 text-primary mb-2">
+        <h3 className="font-serif text-sm font-black italic leading-tight line-clamp-2 text-primary mb-1">
           {item.name}
         </h3>
 
-        <div className="flex items-baseline gap-2">
-           <span className="text-lg font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
+        <div className="flex items-center gap-1">
+           <span className="text-base font-black text-accent">{formatCurrency(item.discount_price || item.price)}</span>
         </div>
       </div>
 
       {/* Background Decor */}
-      <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-accent/5 rounded-full blur-xl group-hover:bg-accent/10 transition-colors" />
-      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-        <Star size={64} className="text-primary" />
-      </div>
+      <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-accent/5 rounded-full blur-xl group-hover:bg-accent/10 transition-colors" />
     </Link>
   );
 }
 
 function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: string }) {
   return (
-    <div className="bg-white rounded-[32px] p-3 shadow-sm flex flex-col gap-3 group relative overflow-hidden active:scale-95 transition-transform">
-      <Link to={`/item/${item.slug}`} className="flex flex-col gap-3">
-        <div className="aspect-square rounded-[24px] overflow-hidden bg-card relative">
+    <div className="bg-white rounded-[24px] p-2.5 shadow-sm flex flex-col gap-2.5 group relative overflow-hidden active:scale-95 transition-transform">
+      <Link to={`/item/${item.slug}`} className="flex flex-col gap-2.5">
+        <div className="aspect-square rounded-[20px] overflow-hidden bg-card relative">
           <img 
             src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
             alt={item.name} 
@@ -352,20 +349,20 @@ function MenuCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?: st
             referrerPolicy="no-referrer"
           />
           {item.discount_price && (
-            <div className="absolute top-3 left-3 bg-accent text-white px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-tighter shadow-lg shadow-accent/20">
+            <div className="absolute top-2 left-2 bg-accent text-white px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter shadow-lg shadow-accent/20">
               {Math.round(((item.price - item.discount_price) / item.price) * 100)}% OFF
             </div>
           )}
         </div>
         <div className="flex flex-col px-1">
-          <h4 className="font-serif font-black text-sm italic leading-tight truncate mb-1">{item.name}</h4>
+          <h4 className="font-serif font-black text-xs italic leading-tight truncate mb-0.5">{item.name}</h4>
           <div className="flex items-center justify-between">
-            <span className="text-accent text-sm font-black">{formatCurrency(item.discount_price || item.price)}</span>
+            <span className="text-accent text-xs font-black">{formatCurrency(item.discount_price || item.price)}</span>
             <button 
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(); }}
-              className="w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+              className="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center shadow-lg active:scale-90 transition-transform"
             >
-              <Plus size={16} />
+              <Plus size={14} />
             </button>
           </div>
         </div>
@@ -378,31 +375,31 @@ function DiscountCard({ item, onAdd }: { item: MenuItem; onAdd: () => void; key?
   const discountPercent = Math.round(((item.price - item.discount_price!) / item.price) * 100);
   
   return (
-    <Link to={`/item/${item.slug}`} className="flex items-center gap-5 bg-white p-5 rounded-[32px] shadow-sm relative overflow-hidden group active:scale-[0.98] transition-transform">
-      <div className="w-24 h-24 rounded-2xl overflow-hidden bg-card shrink-0 shadow-inner relative">
+    <Link to={`/item/${item.slug}`} className="flex items-center gap-4 bg-white p-4 rounded-[28px] shadow-sm relative overflow-hidden group active:scale-[0.98] transition-transform">
+      <div className="w-20 h-20 rounded-xl overflow-hidden bg-card shrink-0 shadow-inner relative">
         <img 
           src={item.image_url?.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'} 
           alt={item.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
           referrerPolicy="no-referrer"
         />
-        <div className="absolute top-1 right-1 bg-accent text-white w-8 h-8 rounded-full flex items-center justify-center text-[8px] font-black italic shadow-lg">
+        <div className="absolute top-1 right-1 bg-accent text-white w-7 h-7 rounded-full flex items-center justify-center text-[7px] font-black italic shadow-lg">
           -{discountPercent}%
         </div>
       </div>
       <div className="flex-1 flex flex-col min-w-0">
-        <span className="text-[10px] font-black text-accent uppercase tracking-widest mb-1 italic">Special Deal</span>
-        <h4 className="font-serif font-black text-xl leading-tight truncate text-primary">{item.name}</h4>
+        <span className="text-[9px] font-black text-accent uppercase tracking-widest mb-0.5 italic">Special Deal</span>
+        <h4 className="font-serif font-black text-lg leading-tight truncate text-primary">{item.name}</h4>
         <div className="flex items-baseline gap-2 mt-1">
-          <span className="text-xl font-black text-accent">{formatCurrency(item.discount_price!)}</span>
-          <span className="text-xs text-muted line-through font-bold">{formatCurrency(item.price)}</span>
+          <span className="text-lg font-black text-accent">{formatCurrency(item.discount_price!)}</span>
+          <span className="text-[10px] text-muted line-through font-bold">{formatCurrency(item.price)}</span>
         </div>
       </div>
       <button 
         onClick={(e) => { e.preventDefault(); onAdd(); }} 
-        className="w-12 h-12 bg-accent text-white rounded-2xl flex items-center justify-center shadow-xl active:scale-90 transition-transform"
+        className="w-10 h-10 bg-accent text-white rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-transform"
       >
-        <Plus size={24} />
+        <Plus size={20} />
       </button>
     </Link>
   );

@@ -86,7 +86,7 @@ export default function Addresses() {
       {/* Header - Fixed Height & Solid Background */}
       <div className="h-24 shrink-0 px-6 flex items-center justify-between sticky top-0 bg-bg z-20 border-b border-gray-100/50">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm active:scale-95 transition-all">
+          <button onClick={() => navigate('/profile')} className="p-3 bg-white rounded-2xl shadow-sm active:scale-95 transition-all">
             <ArrowLeft size={24} />
           </button>
           <h1 className="text-2xl font-black italic">Saved Locations</h1>

@@ -109,7 +109,7 @@ export default function Notifications() {
   if (isLoading) return (
     <div className="p-6 flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
+        <button onClick={() => navigate('/home')} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-3xl font-black italic">Alerts 🦀</h1>
@@ -124,7 +124,7 @@ export default function Notifications() {
   return (
     <div className="p-6 flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white rounded-2xl shadow-sm">
+        <button onClick={() => navigate('/home')} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-3xl font-black italic">Alerts 🦀</h1>
@@ -154,23 +154,23 @@ export default function Notifications() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, x: 20 }}
                 className={cn(
-                  "bg-white p-5 rounded-[32px] shadow-sm flex gap-4 transition-all relative group",
-                  !notif.is_read && "border-l-4 border-accent pl-4"
+                  "bg-white p-4 rounded-[24px] shadow-sm flex gap-3 transition-all relative group",
+                  !notif.is_read && "border-l-4 border-accent pl-3"
                 )}
               >
-                <div className="w-12 h-12 rounded-2xl bg-card flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center shrink-0">
                   {getIcon(notif.type)}
                 </div>
-                <div className="flex-1 flex flex-col gap-1">
+                <div className="flex-1 flex flex-col gap-0.5">
                   <div className="flex justify-between items-start">
-                    <h4 className={cn("font-bold text-sm", !notif.is_read ? "text-primary" : "text-muted")}>
+                    <h4 className={cn("font-bold text-xs", !notif.is_read ? "text-primary" : "text-muted")}>
                       {notif.title}
                     </h4>
-                    <span className="text-[10px] text-muted font-bold uppercase tracking-tight">
+                    <span className="text-[8px] text-muted font-bold uppercase tracking-tight">
                       {formatRelative(new Date(notif.created_at), new Date()).replace('at', '')}
                     </span>
                   </div>
-                  <p className="text-xs text-muted leading-relaxed line-clamp-2">
+                  <p className="text-[11px] text-muted leading-relaxed line-clamp-2">
                     {formatBody(notif.body)}
                   </p>
                 </div>
