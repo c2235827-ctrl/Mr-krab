@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Utensils, Clock, MapPin, Phone } from 'lucide-react';
+import { ArrowLeft, Heart, Utensils, Clock, MapPin, Mail } from 'lucide-react';
 
 export default function About() {
   const navigate = useNavigate();
@@ -115,22 +115,23 @@ export default function About() {
           Get In Touch
         </h3>
         <div className="bg-white p-5 rounded-[32px] shadow-sm flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Phone size={18} />
+          <a href="mailto:mrkrab@ozsaip.com" className="flex items-center gap-4 hover:opacity-75 transition-opacity">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
+              <Mail size={18} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-muted">Call Us</p>
-              <p className="font-bold text-sm">+234 815 937 6128</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-muted">Email Us</p>
+              <p className="font-bold text-sm">mrkrab@ozsaip.com</p>
             </div>
-          </div>
+          </a>
+
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
               <MapPin size={18} />
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-wider text-muted">Find Us</p>
-              <p className="font-bold text-sm">Lagos, Nigeria</p>
+              <p className="font-bold text-sm">All over Nigeria</p>
             </div>
           </div>
         </div>

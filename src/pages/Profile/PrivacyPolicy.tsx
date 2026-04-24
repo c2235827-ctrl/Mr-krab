@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Lock, Eye, Trash2, Bell, MapPin, CreditCard, Phone, Mail } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Eye, Trash2, Bell, MapPin, CreditCard, Mail } from 'lucide-react';
 
 export default function PrivacyPolicy() {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
       title: 'What We Collect',
       color: 'text-blue-500 bg-blue-50',
       content: [
-        'Your name, email address, and phone number when you create an account.',
+        'Your name and email address when you create an account.',
         'Delivery addresses you save for faster ordering.',
         'Your order history so you can reorder your favourites.',
         'Payment confirmation references from Flutterwave — we never store your card details directly.',
@@ -220,10 +220,10 @@ export default function PrivacyPolicy() {
             your data rights, reach out to us directly.
           </p>
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl">
-              <Phone size={18} className="text-accent shrink-0" />
-              <span className="text-sm font-bold">+234 815 937 6128</span>
-            </div>
+            <a href="mailto:mrkrab@ozsaip.com" className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl hover:bg-white/20 transition-colors">
+              <Mail size={18} className="text-accent shrink-0" />
+              <span className="text-sm font-bold">mrkrab@ozsaip.com</span>
+            </a>
           </div>
         </div>
 

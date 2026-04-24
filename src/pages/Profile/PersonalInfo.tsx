@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, User, Phone, Mail, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, Save, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 export default function PersonalInfo() {
@@ -12,7 +12,6 @@ export default function PersonalInfo() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
-    phone: profile?.phone || '',
   });
 
   const handleSave = async (e: React.FormEvent) => {
@@ -25,7 +24,6 @@ export default function PersonalInfo() {
         .from('profiles')
         .update({
           full_name: formData.full_name,
-          phone: formData.phone,
         })
         .eq('id', user.id)
         .select()
@@ -83,20 +81,6 @@ export default function PersonalInfo() {
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   className="w-full bg-card py-5 pl-12 pr-4 rounded-3xl focus:outline-none focus:ring-4 focus:ring-accent/10 transition-all font-bold text-primary placeholder:text-muted/50"
                   placeholder="John Doe"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted ml-1">Phone Number</label>
-              <div className="relative group">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-accent transition-colors" size={18} />
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full bg-card py-5 pl-12 pr-4 rounded-3xl focus:outline-none focus:ring-4 focus:ring-accent/10 transition-all font-bold text-primary placeholder:text-muted/50"
-                  placeholder="+234 ..."
                 />
               </div>
             </div>

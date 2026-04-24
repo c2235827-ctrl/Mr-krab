@@ -16,7 +16,7 @@ export default function Addresses() {
 
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({
-    label: 'Home', street: '', city: 'Lagos', state: 'Lagos', landmark: '', is_default: false
+    label: 'Home', street: '', city: '', state: '', landmark: '', is_default: false
   });
 
   const { data: addresses, isLoading } = useQuery<Address[]>({
@@ -44,7 +44,7 @@ export default function Addresses() {
       queryClient.invalidateQueries({ queryKey: ['addresses'] });
       toast.success('Address added!');
       setIsAddingAddress(false);
-      setNewAddress({ label: 'Home', street: '', city: 'Lagos', state: 'Lagos', landmark: '', is_default: false });
+      setNewAddress({ label: 'Home', street: '', city: '', state: '', landmark: '', is_default: false });
     },
     onError: (err: any) => toast.error(err.message)
   });

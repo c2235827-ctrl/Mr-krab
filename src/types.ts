@@ -1,7 +1,6 @@
 export type Profile = {
   id: string;
   full_name: string | null;
-  phone: string | null;
   avatar_url: string | null;
   role: 'customer' | 'admin' | 'kitchen_staff' | 'delivery_rider';
   is_active: boolean;

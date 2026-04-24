@@ -15,7 +15,8 @@ import {
   UserCircle,
   Smartphone,
   Info,
-  Download
+  Download,
+  Mail
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { motion } from 'motion/react';
@@ -90,6 +91,7 @@ export default function Profile() {
       title: 'Support',
       items: [
         { icon: Info, label: 'About Mr. Krab', path: '/profile/about' },
+        { icon: Mail, label: 'Contact Support', path: 'mailto:mrkrab@ozsaip.com', color: 'text-blue-500 bg-blue-50' },
         ...(isInstallable ? [{ icon: Download, label: 'Install App (PWA)', path: '#', onClick: handleInstall, color: 'text-green-500 bg-green-50' }] : []),
       ]
     }
@@ -113,7 +115,7 @@ export default function Profile() {
         </div>
         <div className="text-center">
            <h2 className="text-3xl font-serif font-black italic">{profile?.full_name || 'Mr. Customer'}</h2>
-           <p className="text-muted text-sm font-medium">{profile?.phone || 'No phone number'}</p>
+           <p className="text-muted text-sm font-medium">{user?.email}</p>
         </div>
         <div className="flex gap-4 justify-center">
            <div className="bg-white px-6 py-3 rounded-2xl shadow-sm text-center">
@@ -139,6 +141,10 @@ export default function Profile() {
                     }
                     if (item.onClick) {
                       item.onClick();
+                      return;
+                    }
+                    if (item.path?.startsWith('mailto:')) {
+                      window.location.href = item.path;
                       return;
                     }
                     if (item.path !== '#') {

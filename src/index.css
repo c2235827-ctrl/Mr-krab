@@ -11,6 +11,11 @@
   --color-muted: #9CA3AF;
   --color-surface: #FFFFFF;
   --color-card: #F5F5F5;
+
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
 }
 
 @layer base {

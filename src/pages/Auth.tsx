@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, Lock, User, Phone, ArrowLeft, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
 import { handleSupabaseError } from '../lib/error-handler';
@@ -17,7 +17,6 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
 
   async function handleAuth(e: React.FormEvent) {
     e.preventDefault();
@@ -46,7 +45,7 @@ export default function Auth() {
           email,
           password,
           options: {
-            data: { full_name: fullName, phone },
+            data: { full_name: fullName },
             emailRedirectTo: `${window.location.origin}/auth`,
           },
         });
@@ -100,17 +99,6 @@ export default function Auth() {
                   required={!isLogin}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-white border border-gray-100 py-4 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
-                />
-              </div>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
-                <input
-                  type="tel"
-                  placeholder="Phone (e.g. +234...)"
-                  required={!isLogin}
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
                   className="w-full bg-white border border-gray-100 py-4 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
                 />
               </div>

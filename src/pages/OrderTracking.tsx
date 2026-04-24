@@ -223,10 +223,10 @@ export default function OrderTracking() {
       {/* Action Buttons */}
       <div className="flex gap-4 mb-10">
          <a 
-           href="tel:+2348159376128"
+           href="mailto:mrkrab@ozsaip.com"
            className="flex-1 btn-primary py-4 flex items-center justify-center p-0"
          >
-           Call Restaurant
+           Contact Support
          </a>
          {order.status === 'delivered' && (
            <button 

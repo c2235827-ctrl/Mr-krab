@@ -36,7 +36,7 @@ export default function Checkout() {
     payment_options: 'card,ussd,banktransfer',
     customer: {
       email: user?.email || '',
-      phone_number: profile?.phone || '',
+      phone_number: '', // Phone number removed by request, passing empty string for compatibility
       name: profile?.full_name || '',
     },
     customizations: {

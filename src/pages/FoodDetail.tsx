@@ -117,74 +117,67 @@ export default function FoodDetail() {
       <motion.div 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="px-8 -mt-10 relative z-10"
+        className="px-6 py-8"
       >
         {/* Info Header */}
-        <div className="bg-white rounded-[40px] p-8 shadow-xl relative">
+        <div className="relative mb-8">
           <div className="flex justify-between items-start mb-4">
-            <div className="flex flex-col gap-1">
-              <span className="text-accent text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-accent/10 rounded-full w-fit">
+            <div className="flex flex-col gap-2">
+              <span className="text-accent text-[11px] font-black uppercase tracking-[0.2em] px-0 py-0 bg-transparent rounded-none w-fit">
                 {item.tags?.[0] || 'CRAB SPECIAL'}
               </span>
-              <h1 className="text-4xl font-serif font-black italic leading-none mt-2">{item.name}</h1>
-            </div>
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-1 text-[#FFB800]">
-                <Star size={18} fill="currentColor" />
-                <span className="text-primary font-black">{ratingData?.avg ?? '—'}</span>
-              </div>
-              <span className="text-xs text-muted">({ratingData?.count ?? 0} reviews)</span>
+              <h1 className="text-5xl font-serif font-black italic leading-[0.9] mt-1">{item.name}</h1>
             </div>
           </div>
 
-          <div className="flex items-baseline gap-3 mb-6">
-            <span className="text-3xl font-black text-accent">{formatCurrency(currentPrice)}</span>
+          <div className="flex items-baseline gap-4 mb-8">
+            <span className="text-4xl font-black text-accent">{formatCurrency(currentPrice)}</span>
             {item.discount_price && (
-              <>
-                <span className="text-lg text-muted line-through font-bold">{formatCurrency(item.price)}</span>
-                <span className="text-xs bg-accent text-white px-3 py-1 rounded-full font-black italic">
-                  {Math.round(((item.price - item.discount_price) / item.price) * 100)}% OFF
+              <div className="flex items-center gap-2">
+                <span className="text-xl text-muted line-through font-bold">{formatCurrency(item.price)}</span>
+                <span className="text-[10px] bg-accent text-white px-2 py-0.5 rounded font-black italic uppercase">
+                  {Math.round(((item.price - item.discount_price) / item.price) * 100)}% 
                 </span>
-              </>
+              </div>
             )}
           </div>
 
-          <div className="flex items-center gap-6 py-4 border-y border-gray-100 mb-6">
-             <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center">
+          <div className="grid grid-cols-2 gap-4 py-8 border-y border-gray-200/60 mb-8">
+             <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-card flex items-center justify-center border border-gray-100">
                   <Clock size={20} className="text-muted" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Ready In</span>
+                  <span className="text-[10px] text-muted font-black uppercase tracking-wider">Ready In</span>
                   <span className="text-sm font-bold">~{item.prep_time_minutes} mins</span>
                 </div>
              </div>
-             <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center">
+             <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center border border-orange-100">
                   <Star size={20} className="text-[#FFB800]" fill="currentColor" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-muted font-bold uppercase tracking-wider">Rating</span>
-                  <span className="text-sm font-bold">{ratingData?.avg ?? '—'} ({ratingData?.count ?? 0} reviews)</span>
+                  <span className="text-[10px] text-muted font-black uppercase tracking-wider">Rating</span>
+                  <span className="text-sm font-bold">{ratingData?.avg ?? '—'} ({ratingData?.count ?? 0})</span>
                 </div>
              </div>
           </div>
 
           {/* Description */}
-          <div className="mb-8">
-            <h3 className="text-lg font-black italic mb-2">The Secret Behind it</h3>
-            <p className="text-muted leading-relaxed">
+          <div className="mb-10">
+            <h3 className="text-sm font-black uppercase tracking-[0.1em] text-muted mb-4">The Secret Recipe</h3>
+            <p className="text-lg text-primary/80 leading-relaxed font-medium">
               {item.description}
             </p>
           </div>
 
-          {/* Use item.allergens if available, else item.tags */}
+          {/* Ingredients */}
           {(item.allergens?.length > 0 || item.tags?.length > 0) && (
-            <div className="mb-8">
-              <h3 className="text-lg font-black italic mb-4">Core Ingredients</h3>
-              <div className="flex flex-wrap gap-4">
+            <div className="mb-4">
+              <h3 className="text-sm font-black uppercase tracking-[0.1em] text-muted mb-4">Core Ingredients</h3>
+              <div className="flex flex-wrap gap-3">
                 {(item.allergens?.length > 0 ? item.allergens : item.tags)?.map((tag, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-card pl-3 pr-4 py-2 rounded-full border border-gray-100">
+                  <div key={i} className="flex items-center gap-2 bg-white px-5 py-3 rounded-2xl border border-gray-100 shadow-sm">
                     <span className="text-sm font-bold capitalize">{tag}</span>
                   </div>
                 ))}
@@ -196,30 +189,37 @@ export default function FoodDetail() {
       </motion.div>
 
       {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 px-6 py-6 bg-white border-t border-gray-100 z-[100] shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
-        <div className="max-w-md mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 bg-card px-3 py-1.5 rounded-2xl border border-gray-100">
-            <button 
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-10 h-10 flex items-center justify-center text-primary active:opacity-60 transition-opacity"
-            >
-              <Minus size={20} />
-            </button>
-            <span className="text-xl font-black w-8 text-center">{quantity}</span>
-            <button 
-              onClick={() => setQuantity(quantity + 1)}
-              className="w-10 h-10 flex items-center justify-center text-accent active:opacity-60 transition-opacity"
-            >
-              <Plus size={20} />
-            </button>
+      <div className="fixed bottom-0 left-0 right-0 px-6 py-8 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-[120] shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
+        <div className="max-w-md mx-auto flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted mb-1">Total Price</span>
+              <span className="text-3xl font-black text-primary">{formatCurrency(total)}</span>
+            </div>
+            
+            <div className="flex items-center gap-2 bg-card p-1.5 rounded-2xl border border-gray-100">
+              <button 
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-11 h-11 flex items-center justify-center hover:bg-white rounded-xl transition-colors text-primary active:scale-95"
+              >
+                <Minus size={20} />
+              </button>
+              <span className="text-lg font-black w-10 text-center">{quantity}</span>
+              <button 
+                onClick={() => setQuantity(quantity + 1)}
+                className="w-11 h-11 flex items-center justify-center hover:bg-white rounded-xl transition-colors text-accent active:scale-95"
+              >
+                <Plus size={20} />
+              </button>
+            </div>
           </div>
           
           <button 
             onClick={handleAddToCart}
-            className="flex-1 btn-primary h-[64px] flex items-center justify-between px-6 shadow-xl shadow-primary/10"
+            className="w-full bg-accent hover:bg-accent/90 active:scale-[0.98] transition-all h-[72px] rounded-[24px] flex items-center justify-center gap-3 group relative overflow-hidden"
           >
-            <span className="font-black italic text-lg">Add to Cart</span>
-            <span className="text-base font-bold opacity-70">{formatCurrency(total)}</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+            <span className="font-black italic text-xl text-white uppercase tracking-wider relative z-10">Add to Cart</span>
           </button>
         </div>
       </div>
