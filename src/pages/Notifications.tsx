@@ -39,10 +39,10 @@ export default function Notifications() {
         schema: 'public',
         table: 'notifications',
         filter: `user_id=eq.${user.id}`,
-      }, (payload) => {
+      }, () => {
+        // Only invalidate, don't show toast (handled globally)
         queryClient.invalidateQueries({ queryKey: ['notifications'] });
         queryClient.invalidateQueries({ queryKey: ['unread-notif-count'] });
-        toast(`🔔 ${payload.new.title}`, { duration: 5000 });
       })
       .subscribe();
 
