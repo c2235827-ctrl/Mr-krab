@@ -34,7 +34,7 @@ export function usePushNotifications() {
             badge: '/icon.svg',
             vibrate: [200, 100, 200],
             silent: false, // let the OS play its default notification sound
-          });
+          } as any);
 
           // Clicking the notification focuses the app
           notification.onclick = () => {

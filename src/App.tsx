@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
@@ -8,7 +8,6 @@ import { useAuthStore } from './store/useAuthStore';
 // Pages - to be created
 import Splash from './pages/Splash';
 import Auth from './pages/Auth';
-import ResetPassword from './pages/ResetPassword';
 import Home from './pages/Home';
 import Orders from './pages/Orders';
 import ProfilePage from './pages/Profile';
@@ -79,11 +78,6 @@ export default function App() {
     try {
       // Initial session check
       supabase.auth.getSession().then(({ data: { session }, error }) => {
-        // Check if we are currently in a password reset flow
-        const isRecovery = window.location.hash.includes('access_token') || 
-                          window.location.search.includes('type=recovery') ||
-                          window.location.pathname === '/reset-password';
-
         if (error) {
           const errMsg = error.message.toLowerCase();
           const isAuthError = errMsg.includes('refresh_token_not_found') || 
@@ -91,7 +85,7 @@ export default function App() {
                              errMsg.includes('invalid refresh token') ||
                              errMsg.includes('invalid_grant');
 
-          if (isAuthError && !isRecovery) {
+          if (isAuthError) {
             console.warn('Session expired or invalid, cleaning local state...');
             
             // Clear standard and project-specific keys
@@ -104,12 +98,6 @@ export default function App() {
                 window.location.href = '/auth';
               }
             });
-            return;
-          }
-          
-          if (isAuthError && isRecovery) {
-            // If it's an auth error but we have recovery tokens, just clear the error and let the SDK handle it
-            console.log('Detected recovery flow with legacy session error, ignoring error to allow recovery');
             return;
           }
           
@@ -133,17 +121,11 @@ export default function App() {
           errMsg.includes('invalid refresh token') ||
           errMsg.includes('invalid_grant')
         ) {
-          const isRecovery = window.location.hash.includes('access_token') || 
-                            window.location.search.includes('type=recovery') ||
-                            window.location.pathname === '/reset-password';
-          
-          if (!isRecovery) {
-            window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
-            supabase.auth.signOut().finally(() => {
-              setAuth(null, null);
-              if (window.location.pathname !== '/auth') window.location.href = '/auth';
-            });
-          }
+          window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
+          supabase.auth.signOut().finally(() => {
+            setAuth(null, null);
+            if (window.location.pathname !== '/auth') window.location.href = '/auth';
+          });
         } else {
           console.error('Session check error:', err);
           setAuth(null, null);
@@ -221,7 +203,6 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Splash />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
           
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/home" element={<Home />} />
