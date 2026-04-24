@@ -42,26 +42,49 @@ export default function Profile() {
   };
 
   const handleTestNotification = async () => {
-    if (Notification.permission !== 'granted') {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        toast.error('Notification permission denied');
+    try {
+      // 1. Check if notifications are supported
+      if (!('Notification' in window)) {
+        toast.error('Notifications not supported on this device');
         return;
       }
-    }
 
-    try {
-      // Local notification to test if it works in foreground
-      new Notification('Mr. Krab 🦀', {
-        body: 'This is a test alert! If you see this, your notifications are working.',
-        icon: '/icon.svg',
-        badge: '/icon.svg',
-        silent: false,
-      } as any);
-      toast.success('Test alert sent!');
+      // 2. Request permission if needed
+      if (Notification.permission !== 'granted') {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          toast.error('Please enable notifications in your browser settings');
+          return;
+        }
+      }
+
+      // 3. Trigger notification using Service Worker for maximum reliability
+      const registration = await navigator.serviceWorker.ready;
+      
+      if (registration && 'showNotification' in registration) {
+        await registration.showNotification('Mr. Krab 🦀', {
+          body: 'This is a test alert! If you see this, your notifications are working.',
+          icon: '/icon.svg',
+          badge: '/icon.svg',
+          tag: 'test-notification',
+          renotify: true,
+          data: {
+            url: '/notifications'
+          }
+        } as any);
+        toast.success('Test alert sent!');
+      } else {
+        // Fallback for environments without functional SW
+        new Notification('Mr. Krab 🦀', {
+          body: 'This is a test alert! (Fallback mode)',
+          icon: '/icon.svg',
+          badge: '/icon.svg',
+        } as any);
+        toast.success('Test alert sent (fallback)!');
+      }
     } catch (err) {
       console.error('Test notification failed:', err);
-      toast.error('Failed to trigger alert');
+      toast.error('Failed to trigger alert. Check browser console.');
     }
   };
 
