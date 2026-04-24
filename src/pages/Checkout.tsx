@@ -29,8 +29,7 @@ export default function Checkout() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const fwConfig = {
-    public_key: import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY 
-      || 'FLWPUBK_TEST-bada1e713350586cc6e1d8e165d8b064-X',
+    public_key: 'FLWPUBK-f85c96b107f477b6ac4805097fb77dbf-X', // Explicitly using live key provided
     tx_ref: `KRB-${Date.now()}`,
     amount: total,
     currency: 'NGN',
@@ -133,6 +132,9 @@ export default function Checkout() {
       return;
     }
 
+    setIsProcessing(true);
+    console.log('[Checkout] Initiating payment with Live Key...');
+    
     handleFlutterwavePayment({
       callback: (response) => {
         const status = response.status?.toLowerCase();
@@ -142,10 +144,13 @@ export default function Checkout() {
         } else {
           console.error('[Checkout] Payment failed. Trace ID:', response.transaction_id || 'N/A', 'Status:', status);
           toast.error(`Payment ${status || 'failed'}. If you were debited, contact support with ref: ${response.tx_ref}`);
+          setIsProcessing(false);
         }
         closePaymentModal();
       },
       onClose: () => {
+        console.log('[Checkout] Payment modal closed by user');
+        setIsProcessing(false);
         toast('Payment abandoned', { icon: 'ℹ️' });
       },
     });
