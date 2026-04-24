@@ -15,8 +15,7 @@ import {
   UserCircle,
   Smartphone,
   Info,
-  Download,
-  BellRing
+  Download
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { motion } from 'motion/react';
@@ -39,53 +38,6 @@ export default function Profile() {
     await signOut();
     toast.success('Logged out successfully');
     navigate('/auth');
-  };
-
-  const handleTestNotification = async () => {
-    try {
-      // 1. Check if notifications are supported
-      if (!('Notification' in window)) {
-        toast.error('Notifications not supported on this device');
-        return;
-      }
-
-      // 2. Request permission if needed
-      if (Notification.permission !== 'granted') {
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') {
-          toast.error('Please enable notifications in your browser settings');
-          return;
-        }
-      }
-
-      // 3. Trigger notification using Service Worker for maximum reliability
-      const registration = await navigator.serviceWorker.ready;
-      
-      if (registration && 'showNotification' in registration) {
-        await registration.showNotification('Mr. Krab 🦀', {
-          body: 'This is a test alert! If you see this, your notifications are working.',
-          icon: '/icon.svg',
-          badge: '/icon.svg',
-          tag: 'test-notification',
-          renotify: true,
-          data: {
-            url: '/notifications'
-          }
-        } as any);
-        toast.success('Test alert sent!');
-      } else {
-        // Fallback for environments without functional SW
-        new Notification('Mr. Krab 🦀', {
-          body: 'This is a test alert! (Fallback mode)',
-          icon: '/icon.svg',
-          badge: '/icon.svg',
-        } as any);
-        toast.success('Test alert sent (fallback)!');
-      }
-    } catch (err) {
-      console.error('Test notification failed:', err);
-      toast.error('Failed to trigger alert. Check browser console.');
-    }
   };
 
   const handleInstall = async () => {
@@ -130,7 +82,6 @@ export default function Profile() {
       title: 'Preferences',
       items: [
         { icon: Bell, label: 'Notifications', path: '/notifications' },
-        { icon: BellRing, label: 'Test Alert Flow', path: '#', onClick: handleTestNotification, color: 'text-accent bg-accent/10' },
         { icon: Smartphone, label: 'Biometric Login', path: '#', toggle: true, checked: profile?.biometric_enabled },
         { icon: Shield, label: 'Privacy & Security', path: '/profile/security' },
       ]
