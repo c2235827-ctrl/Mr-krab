@@ -83,7 +83,10 @@ export default function App() {
           const isAuthError = errMsg.includes('refresh_token_not_found') || 
                              errMsg.includes('refresh token not found') || 
                              errMsg.includes('invalid refresh token') ||
-                             errMsg.includes('invalid_grant');
+                             errMsg.includes('invalid_grant') ||
+                             errMsg.includes('session_not_found') ||
+                             errMsg.includes('token_not_found') ||
+                             (errMsg.includes('refresh') && errMsg.includes('token'));
 
           if (isAuthError) {
             console.warn('Session expired or invalid, cleaning local state...');
@@ -119,7 +122,10 @@ export default function App() {
           errMsg.includes('refresh_token_not_found') || 
           errMsg.includes('refresh token not found') || 
           errMsg.includes('invalid refresh token') ||
-          errMsg.includes('invalid_grant')
+          errMsg.includes('invalid_grant') ||
+          errMsg.includes('session_not_found') ||
+          errMsg.includes('token_not_found') ||
+          (errMsg.includes('refresh') && errMsg.includes('token'))
         ) {
           window.localStorage.removeItem('sb-yisnyqrztkwxqnvslmqr-auth-token');
           supabase.auth.signOut().finally(() => {

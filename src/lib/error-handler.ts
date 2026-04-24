@@ -14,7 +14,10 @@ export function handleSupabaseError(error: any, operation?: string) {
       message.includes('invalid refresh token') || 
       message.includes('refresh token not found') ||
       message.includes('refresh_token_not_found') ||
-      message.includes('invalid_grant')) {
+      message.includes('invalid_grant') ||
+      message.includes('session_not_found') ||
+      message.includes('token_not_found') ||
+      (message.includes('refresh') && message.includes('token'))) {
     
     const isRecovery = window.location.hash.includes('access_token') || 
                       window.location.search.includes('type=recovery') ||
