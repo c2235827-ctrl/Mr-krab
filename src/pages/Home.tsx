@@ -127,7 +127,7 @@ export default function Home() {
           </div>
           <div>
             <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-bold">Good Day</p>
-            <h3 className="font-serif text-lg leading-tight italic font-black">Ready for a Feast? 🦀</h3>
+            <h3 className="font-serif text-lg leading-tight italic font-black">Ready for a Feast? 🥩</h3>
           </div>
         </Link>
         <div className="flex gap-2">
@@ -287,7 +287,7 @@ export default function Home() {
         
         {items?.length === 0 ? (
           <div className="py-20 text-center bg-card rounded-[40px] opacity-50">
-            <span className="text-4xl">🦀</span>
+            <span className="text-4xl">🥩</span>
             <p className="text-xs font-black uppercase tracking-widest mt-4">Coming Soon to this category</p>
           </div>
         ) : (
@@ -310,7 +310,7 @@ export default function Home() {
       {/* Special Items */}
       {discountItems && discountItems.length > 0 && activeCategory === 'all' && (
         <div className="flex flex-col gap-4 mt-4">
-          <h2 className="text-2xl font-black italic">Special For You 🦀</h2>
+          <h2 className="text-2xl font-black italic">Special For You 🥩</h2>
           <div className="flex flex-col gap-4 pb-4">
             {discountItems.map((item) => (
               <DiscountCard 

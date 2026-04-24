@@ -94,11 +94,11 @@ export default function Notifications() {
         <button onClick={() => navigate('/home')} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-3xl font-black italic">Alerts 🦀</h1>
+        <h1 className="text-3xl font-black italic">Alerts 🥩</h1>
         <div className="w-12" />
       </div>
       <div className="p-10 text-center text-muted font-bold animate-pulse italic">
-        Checking your crab alerts...
+        Checking your box alerts...
       </div>
     </div>
   );
@@ -109,7 +109,7 @@ export default function Notifications() {
         <button onClick={() => navigate('/home')} className="p-3 bg-white rounded-2xl shadow-sm">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-3xl font-black italic">Alerts 🦀</h1>
+        <h1 className="text-3xl font-black italic">Alerts 🥩</h1>
         <button 
           onClick={() => markAsRead.mutate()}
           className="p-3 bg-white rounded-2xl shadow-sm text-accent active:opacity-75 transition-opacity"

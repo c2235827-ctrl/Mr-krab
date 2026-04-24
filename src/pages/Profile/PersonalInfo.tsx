@@ -32,7 +32,7 @@ export default function PersonalInfo() {
       if (error) throw error;
       
       setAuth(user, data);
-      toast.success('Information updated successfully! 🦀');
+      toast.success('Information updated successfully! 🥩');
       navigate(-1);
     } catch (err: any) {
       toast.error(err.message || 'Failed to update information');

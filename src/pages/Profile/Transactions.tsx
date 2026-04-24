@@ -131,7 +131,7 @@ export default function Transactions() {
                 <History size={40} className="text-muted" />
               </div>
               <h3 className="text-lg font-black italic mb-2">No transactions yet</h3>
-              <p className="text-muted text-xs font-medium max-w-[200px]">When you order, your payment history will appear here! 🦀</p>
+              <p className="text-muted text-xs font-medium max-w-[200px]">When you order, your payment history will appear here! 🥩</p>
             </div>
           )}
         </div>

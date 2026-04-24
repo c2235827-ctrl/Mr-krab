@@ -71,8 +71,8 @@ export default function Profile() {
     {
       title: 'Support',
       items: [
-        { icon: Info, label: 'About Mr. Krab', path: '/profile/about' },
-        { icon: Mail, label: 'Contact Support', path: 'mailto:mrkrab@ozsaip.com', color: 'text-blue-500 bg-blue-50' },
+        { icon: Info, label: 'About BEEF BOX', path: '/profile/about' },
+        { icon: Mail, label: 'Contact Support', path: 'mailto:beefbox@ozsaip.com', color: 'text-blue-500 bg-blue-50' },
         ...(isInstallable ? [{ icon: Download, label: 'Install App (PWA)', path: '#', onClick: handleInstall, color: 'text-green-500 bg-green-50' }] : []),
       ]
     }
@@ -157,7 +157,7 @@ export default function Profile() {
       </button>
 
       <div className="text-center mt-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted opacity-30 italic">Mr. Krab v1.0.0</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted opacity-30 italic">BEEF BOX v1.0.0</p>
       </div>
     </div>
   );

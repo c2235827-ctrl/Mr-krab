@@ -1,5 +1,5 @@
 -- ==========================================================
--- MR. KRAB WALLET & SYSTEM FUNCTIONS
+-- BEEF BOX WALLET & SYSTEM FUNCTIONS
 -- Run this in your Supabase SQL Editor to fix the Wallet errors.
 -- ==========================================================
 

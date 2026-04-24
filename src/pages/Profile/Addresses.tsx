@@ -111,7 +111,7 @@ export default function Addresses() {
               <MapPin size={64} className="text-muted/30" />
             </div>
             <h3 className="text-2xl font-black italic mb-2">No spots saved yet</h3>
-            <p className="text-muted text-sm font-medium mb-12 max-w-[240px] mx-auto leading-relaxed">Add your home or office address to make ordering as fast as a racing crab! 🦀</p>
+            <p className="text-muted text-sm font-medium mb-12 max-w-[240px] mx-auto leading-relaxed">Add your home or office address to make ordering lightning fast! 🥩</p>
             <button 
               onClick={() => setIsAddingAddress(true)}
               className="btn-primary w-full max-w-[240px] h-16"
@@ -183,7 +183,7 @@ export default function Addresses() {
               className="bg-white w-full max-w-md rounded-t-[48px] sm:rounded-[48px] p-8 pb-12 relative z-10 shadow-2xl max-h-[95vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center mb-10">
-                <h2 className="text-3xl font-serif font-black italic tracking-tight">Add Address 🦀</h2>
+                <h2 className="text-3xl font-serif font-black italic tracking-tight">Add Address 🥩</h2>
                 <button onClick={() => setIsAddingAddress(false)} className="p-3 hover:bg-card rounded-full transition-colors font-bold text-muted">
                   <X size={24} />
                 </button>

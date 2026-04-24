@@ -101,7 +101,7 @@ export function usePushNotifications() {
 
           onMessage(messaging, (payload) => {
             console.log('[Push] Foreground message (FCM) received:', payload);
-            const title = payload.notification?.title || 'Mr. Krab 🦀';
+            const title = payload.notification?.title || 'BEEF BOX 🥩';
             const body = payload.notification?.body || 'You have a new notification';
             showNativeNotification(title, body, payload.data);
             toast(body, { icon: '🔔', duration: 6000 });
@@ -124,7 +124,7 @@ export function usePushNotifications() {
           filter: `user_id=eq.${user.id}`,
         }, (payload) => {
           console.log('[Push] New notification (Supabase) inserted:', payload.new);
-          const title = payload.new.title || 'Mr. Krab 🦀';
+          const title = payload.new.title || 'BEEF BOX 🥩';
           const body = payload.new.body || 'You have a new update';
           showNativeNotification(title, body, { id: payload.new.id, url: '/notifications' });
           toast(body, { icon: '🔔', duration: 6000 });

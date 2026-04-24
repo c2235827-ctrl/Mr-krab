@@ -114,7 +114,7 @@ export default function PrivacyPolicy() {
               Your trust is our most important ingredient.
             </h2>
             <p className="text-sm opacity-80 leading-relaxed">
-              At Mr. Krab, we handle your personal information with the same care 
+              At BEEF BOX, we handle your personal information with the same care 
               we put into every meal. Simple, honest, and always in your best interest.
             </p>
           </div>
@@ -143,7 +143,7 @@ export default function PrivacyPolicy() {
             third-party advertisers. Your information exists only to help us 
             serve you better."
           </p>
-          <p className="text-xs text-muted font-bold mt-2">— Mr. Krab Team</p>
+          <p className="text-xs text-muted font-bold mt-2">— BEEF BOX Team</p>
         </div>
 
         {/* Policy Sections */}
@@ -206,7 +206,7 @@ export default function PrivacyPolicy() {
         <div className="bg-white p-6 rounded-[32px] shadow-sm flex flex-col gap-3">
           <h3 className="font-black text-base">Age Policy</h3>
           <p className="text-sm text-muted leading-relaxed">
-            Mr. Krab is intended for users aged 13 and above. We do not knowingly 
+            BEEF BOX is intended for users aged 13 and above. We do not knowingly 
             collect data from children under 13. If you believe a child has registered, 
             please contact us immediately.
           </p>
@@ -220,9 +220,9 @@ export default function PrivacyPolicy() {
             your data rights, reach out to us directly.
           </p>
           <div className="flex flex-col gap-3">
-            <a href="mailto:mrkrab@ozsaip.com" className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl hover:bg-white/20 transition-colors">
+            <a href="mailto:beefbox@ozsaip.com" className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl hover:bg-white/20 transition-colors">
               <Mail size={18} className="text-accent shrink-0" />
-              <span className="text-sm font-bold">mrkrab@ozsaip.com</span>
+              <span className="text-sm font-bold">beefbox@ozsaip.com</span>
             </a>
           </div>
         </div>
@@ -230,7 +230,7 @@ export default function PrivacyPolicy() {
         {/* Footer */}
         <div className="text-center py-4">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted opacity-40">
-            Mr. Krab · Privacy Policy · April 2026
+            BEEF BOX · Privacy Policy · April 2026
           </p>
           <p className="text-[10px] text-muted opacity-30 mt-1">
             This policy may be updated periodically. Continued use of the app 

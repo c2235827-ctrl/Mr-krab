@@ -13,7 +13,7 @@ const steps: { status: OrderStatus; label: string; icon: any; description: strin
   { status: 'preparing', label: 'Preparing', icon: Utensils, description: 'Your food is being cooked' },
   { status: 'ready', label: 'Order Ready', icon: Package, description: 'Order prepared and packed' },
   { status: 'out_for_delivery', label: 'On its way', icon: Truck, description: 'Rider is bringing your order' },
-  { status: 'delivered', label: 'Delivered', icon: Flag, description: 'Enjoy your meal! 🦀' },
+  { status: 'delivered', label: 'Delivered', icon: Flag, description: 'Enjoy your meal! 🥩' },
 ];
 
 import { Utensils, ClipboardList } from 'lucide-react';
@@ -234,7 +234,7 @@ export default function OrderTracking() {
          
          <div className="flex gap-4">
            <a 
-             href="mailto:mrkrab@ozsaip.com"
+             href="mailto:beefbox@ozsaip.com"
              className="flex-1 border-2 border-primary text-primary py-4 rounded-xl flex items-center justify-center font-bold text-sm"
            >
              Contact Support

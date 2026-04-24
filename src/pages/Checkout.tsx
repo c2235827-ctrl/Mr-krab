@@ -40,7 +40,7 @@ export default function Checkout() {
       name: profile?.full_name || '',
     },
     customizations: {
-      title: 'Mr. Krab',
+      title: 'BEEF BOX',
       description: 'Food order payment',
       logo: 'https://api.dicebear.com/7.x/initials/svg?seed=MK&backgroundColor=111111',
     },

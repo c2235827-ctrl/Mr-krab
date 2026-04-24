@@ -37,7 +37,7 @@ export default function Auth() {
         if (profileError) throw profileError;
 
         setAuth(data.user, profile);
-        toast.success('Welcome back! 🦀');
+        toast.success('Welcome back! 🥩');
         navigate('/home', { replace: true });
 
       } else {
@@ -78,7 +78,7 @@ export default function Auth() {
           {isLogin ? 'Welcome Back' : 'Join the Family'}
         </h1>
         <p className="text-muted text-lg">
-          {isLogin ? 'Authentic flavour is just a tap away.' : 'Start your food journey with Mr. Krab.'}
+          {isLogin ? 'Authentic flavour is just a tap away.' : 'Start your food journey with BEEF BOX.'}
         </p>
       </div>
 

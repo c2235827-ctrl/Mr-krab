@@ -33,10 +33,10 @@ export default function Splash() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center"
         >
-          <div className="text-7xl mb-4">🦀</div>
-          <span className="text-accent text-sm font-bold tracking-[0.3em] uppercase mb-2 block">Authentic Flavours</span>
+          <div className="text-7xl mb-4">🥩</div>
+          <span className="text-accent text-sm font-bold tracking-[0.3em] uppercase mb-2 block">Boxed to Perfection</span>
           <h1 className="text-white text-6xl md:text-7xl font-black italic leading-tight">
-            Mr. Krab
+            BEEF BOX
           </h1>
         </motion.div>
       </div>
@@ -69,10 +69,10 @@ export default function Splash() {
 
       {/* Aesthetic Accents */}
       <div className="absolute top-10 right-10 text-white/10 font-serif text-8xl pointer-events-none select-none">
-        🦀
+        🥩
       </div>
       <div className="absolute bottom-40 -left-10 text-white/5 font-serif text-[12rem] pointer-events-none select-none rotate-12">
-        蟹
+        📦
       </div>
     </div>
   );

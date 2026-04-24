@@ -14,8 +14,8 @@ export default defineConfig(({mode}) => {
         registerType: 'autoUpdate',
         injectRegister: 'auto',
         manifest: {
-          name: 'Mr. Krab',
-          short_name: 'MrKrab',
+          name: 'BEEF BOX',
+          short_name: 'BEEFBOX',
           description: 'Real Food. Authentic Flavours.',
           theme_color: '#111111',
           background_color: '#FAFAFA',

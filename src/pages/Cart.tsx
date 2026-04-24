@@ -101,7 +101,7 @@ export default function Cart() {
            <ShoppingBag size={80} className="text-muted" />
         </div>
         <h2 className="text-3xl font-serif font-black italic mb-4">Your cart is empty</h2>
-        <p className="text-muted mb-10 text-sm">Looks like you haven't added anything to your cart yet. Let's find you something delicious! 🦀</p>
+        <p className="text-muted mb-10 text-sm">Looks like you haven't added anything to your cart yet. Let's find you something delicious! 🥩</p>
         <div className="flex flex-col gap-3 w-full max-w-[280px]">
           <Link to="/home" className="btn-primary w-full py-4">Explore Menu</Link>
           <button 
@@ -237,7 +237,7 @@ export default function Cart() {
         <button 
           onClick={() => {
             if (!defaultAddress) {
-              toast.error('Please add a delivery address first! 🦀');
+              toast.error('Please add a delivery address first! 🥩');
               navigate('/profile');
               return;
             }
